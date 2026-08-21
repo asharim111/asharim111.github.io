@@ -3,9 +3,16 @@ import Navbar from "./components/Navbar";
 import ScrollProgress from "./components/ScrollProgress";
 import CustomCursor from "./components/CustomCursor";
 import Footer from "./components/Footer";
+import BootScreen from "./components/BootScreen";
+import SystemConsole from "./components/SystemConsole";
+import CommandPalette from "./components/CommandPalette";
+import SectionRail from "./components/SectionRail";
+import BackToTop from "./components/BackToTop";
+import InterestSelector from "./components/InterestSelector";
 import Hero from "./sections/Hero";
 import MetricsStrip from "./sections/MetricsStrip";
 import About from "./sections/About";
+import { useSystemObserver } from "./hooks/useSystemObserver";
 
 // Below-the-fold sections are code-split
 const ExperienceSection = lazy(() => import("./sections/ExperienceSection"));
@@ -18,6 +25,8 @@ const SystemMetrics = lazy(() => import("./sections/SystemMetrics"));
 const Contact = lazy(() => import("./sections/Contact"));
 
 export default function App() {
+  useSystemObserver();
+
   return (
     <>
       <a
@@ -26,12 +35,18 @@ export default function App() {
       >
         Skip to content
       </a>
+      <BootScreen />
       <ScrollProgress />
       <CustomCursor />
+      <CommandPalette />
+      <SectionRail />
+      <SystemConsole />
+      <BackToTop />
       <Navbar />
       <main>
         <Hero />
         <MetricsStrip />
+        <InterestSelector />
         <About />
         <Suspense fallback={<div className="py-32 text-center font-mono text-xs text-dim">LOADING…</div>}>
           <ExperienceSection />

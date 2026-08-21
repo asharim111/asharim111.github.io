@@ -1,8 +1,18 @@
 import SectionHeading from "../components/SectionHeading";
 import Reveal from "../components/Reveal";
 import { skillGroups } from "../data/skills";
+import { system, useSystem } from "../lib/system";
+
+const DISCOVERY_STATS = [
+  ["04", "SYSTEMS"],
+  ["05", "ARCHITECTURES"],
+  ["19", "DLP CATEGORIES"],
+  ["07+", "YEARS"],
+] as const;
 
 export default function Skills() {
+  const discovery = useSystem((s) => s.discovery);
+
   return (
     <section id="skills" className="mx-auto max-w-7xl px-4 py-24 md:px-8 md:py-32">
       <SectionHeading
@@ -11,6 +21,22 @@ export default function Skills() {
         title="Technology Stack"
         subtitle="An ecosystem built over 7 years — hover any technology for how it's been used."
       />
+
+      {discovery && (
+        <Reveal className="mb-10">
+          <div className="glass flex flex-wrap items-center justify-center gap-x-10 gap-y-4 rounded-lg border-violet/30 px-6 py-4 font-mono">
+            <span className="flex items-center gap-2 text-[10px] tracking-[0.25em] text-violet">
+              <span className="h-1.5 w-1.5 rounded-full bg-violet [animation:pulse-soft_2s_ease-in-out_infinite]" />
+              DISCOVERY MODE [ ACTIVE ]
+            </span>
+            {DISCOVERY_STATS.map(([n, label]) => (
+              <span key={label} className="text-[11px] text-muted">
+                <span className="font-semibold text-fg">{n}</span> {label}
+              </span>
+            ))}
+          </div>
+        </Reveal>
+      )}
 
       {/* Central identity node */}
       <Reveal className="mb-10 flex justify-center">
@@ -27,8 +53,9 @@ export default function Skills() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {skillGroups.map((group, gi) => (
-          <Reveal key={group.id} delay={gi * 0.06}>
-            <div className="group/panel relative h-full overflow-hidden rounded-lg border border-line bg-panel p-6 transition-colors duration-300 hover:border-line-bright">
+          <Reveal key={group.id} delay={gi * 0.06} className="relative hover:z-20 focus-within:z-20">
+            {/* No overflow-hidden here — skill tooltips must escape the card */}
+            <div className="group/panel relative h-full rounded-lg border border-line bg-panel p-6 transition-colors duration-300 hover:border-line-bright">
               {/* Connection line up toward the center node */}
               <span
                 aria-hidden="true"
@@ -44,12 +71,20 @@ export default function Skills() {
               </div>
               <div className="mt-5 flex flex-wrap gap-2">
                 {group.skills.map((s) => (
-                  <span key={s.name} className="group/chip relative">
+                  <span
+                    key={s.name}
+                    className="group/chip relative hover:z-30 focus-within:z-30"
+                    data-cursor="details"
+                  >
                     <span
                       tabIndex={0}
+                      onFocus={() => system.inspectTech(s.name)}
                       className="inline-block cursor-default rounded border border-line bg-panel-2 px-2.5 py-1.5 font-mono text-[11px] text-muted transition-all duration-200 hover:-translate-y-0.5 hover:text-fg focus-visible:text-fg"
                       style={{ ["--accent" as string]: group.accent }}
-                      onMouseEnter={(e) => (e.currentTarget.style.borderColor = `${group.accent}80`)}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = `${group.accent}80`;
+                        system.inspectTech(s.name);
+                      }}
                       onMouseLeave={(e) => (e.currentTarget.style.borderColor = "")}
                     >
                       {s.name}

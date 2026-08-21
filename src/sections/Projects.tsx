@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ArrowRight, X } from "lucide-react";
 import SectionHeading from "../components/SectionHeading";
 import Reveal from "../components/Reveal";
 import FlowDiagram from "../components/FlowDiagram";
 import { projects, projectFilters, type Project, type ProjectCategory } from "../data/projects";
+import { system } from "../lib/system";
 
 /* ---------- per-project visuals ---------- */
 
@@ -101,7 +102,51 @@ const visuals = {
 
 /* ---------- detail modal ---------- */
 
+/** Short "system boot" shown while a project opens — INITIALIZING → module
+ *  checks → SYSTEM READY. Skipped under reduced motion. */
+function ModalBoot({ project }: { project: Project }) {
+  const modules = project.detail.architecture.slice(0, 4);
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    const timers = project.detail.architecture
+      .slice(0, 4)
+      .map((_, i) => window.setTimeout(() => setCount(i + 1), 150 + i * 180));
+    return () => timers.forEach(clearTimeout);
+  }, [project]);
+
+  return (
+    <div className="flex min-h-[280px] items-center justify-center p-8 font-mono" aria-hidden="true">
+      <div className="w-64">
+        <div className="text-[10px] tracking-[0.3em] text-cyan">
+          INITIALIZING {project.name.toUpperCase()}
+        </div>
+        <div className="mt-4 space-y-1.5 text-[10.5px]">
+          {modules.map((m, i) => (
+            <div key={m} className="flex items-center justify-between">
+              <span className={i < count ? "text-muted" : "text-dim/40"}>
+                {m.toUpperCase().slice(0, 26)}
+              </span>
+              <span className={i < count ? "text-mint" : "text-dim/40"}>
+                {i < count ? "OK" : "···"}
+              </span>
+            </div>
+          ))}
+        </div>
+        {count >= modules.length && (
+          <div className="mt-4 text-center text-[10px] tracking-[0.3em] text-mint">
+            SYSTEM READY
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function ProjectModal({ project, onClose }: { project: Project; onClose: () => void }) {
+  const reduced = useReducedMotion();
+  const [booting, setBooting] = useState(!reduced);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
@@ -112,13 +157,19 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
     };
   }, [onClose]);
 
+  useEffect(() => {
+    if (!booting) return;
+    const t = window.setTimeout(() => setBooting(false), 1150);
+    return () => clearTimeout(t);
+  }, [booting]);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-[70] flex items-start justify-center overflow-y-auto bg-ink/80 p-4 backdrop-blur-sm md:p-8"
-      onClick={onClose}
+      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
       role="dialog"
       aria-modal="true"
       aria-label={`${project.name} details`}
@@ -131,6 +182,10 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
         onClick={(e) => e.stopPropagation()}
         className="glass my-8 w-full max-w-3xl rounded-lg"
       >
+        {booting ? (
+          <ModalBoot project={project} />
+        ) : (
+          <motion.div initial={reduced ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
         <div className="flex items-start justify-between border-b border-line p-6">
           <div>
             <div className="tech-label text-cyan">{project.index} / {project.dates}</div>
@@ -201,6 +256,8 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
             </div>
           </div>
         </div>
+          </motion.div>
+        )}
       </motion.div>
     </motion.div>
   );
@@ -211,9 +268,28 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
 export default function Projects() {
   const [filter, setFilter] = useState<"All" | ProjectCategory>("All");
   const [selected, setSelected] = useState<Project | null>(null);
+  const hoverTimer = useRef(0);
 
   const visible =
     filter === "All" ? projects : projects.filter((p) => p.categories.includes(filter));
+
+  const openProject = (p: Project) => {
+    system.visitProject(p.id, p.name);
+    setSelected(p);
+  };
+
+  // Dwell-hover cues — fire once per session after 1.6s over a card
+  const onCardEnter = (p: Project) => {
+    window.clearTimeout(hoverTimer.current);
+    hoverTimer.current = window.setTimeout(() => {
+      if (p.id === "ai-gateway") {
+        system.logOnce("hover-gateway", "this is where AI meets enterprise security.", "accent");
+      } else {
+        system.logOnce("hover-project", "looks like this one caught your attention.", "info");
+      }
+    }, 1600);
+  };
+  const onCardLeave = () => window.clearTimeout(hoverTimer.current);
 
   return (
     <section id="projects" className="mx-auto max-w-7xl px-4 py-24 md:px-8 md:py-32">
@@ -259,13 +335,37 @@ export default function Projects() {
                 className={`group relative flex cursor-pointer flex-col rounded-lg border bg-panel p-6 transition-all duration-300 hover:-translate-y-1.5 hover:border-cyan/40 hover:shadow-[0_16px_50px_rgba(34,211,238,0.07)] md:p-8 ${
                   p.hero ? "border-cyan/25 lg:col-span-2" : "border-line"
                 }`}
-                onClick={() => setSelected(p)}
+                onClick={() => openProject(p)}
+                onMouseEnter={() => onCardEnter(p)}
+                onMouseLeave={onCardLeave}
               >
                 {p.hero && (
                   <span className="absolute right-6 top-6 rounded border border-violet/40 bg-violet/10 px-2 py-0.5 font-mono text-[10px] tracking-wider text-violet">
                     FLAGSHIP
                   </span>
                 )}
+
+                {/* Module readout — slides in on hover like a system inspector */}
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-x-0 bottom-0 translate-y-2 rounded-b-lg border-t border-line bg-ink/90 px-6 py-3 font-mono text-[10px] opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 md:px-8"
+                >
+                  <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
+                    <span>
+                      <span className="text-dim">STATUS </span>
+                      <span className="text-mint">MODULE READY</span>
+                    </span>
+                    <span>
+                      <span className="text-dim">TYPE </span>
+                      <span className="text-cyan">{p.categories[0].toUpperCase()}</span>
+                    </span>
+                    <span className="hidden sm:inline">
+                      <span className="text-dim">STACK </span>
+                      <span className="text-fg">{p.stack.slice(0, 3).join(" / ").toUpperCase()}</span>
+                    </span>
+                    <span className="ml-auto tracking-[0.2em] text-cyan">[ OPEN SYSTEM ]</span>
+                  </div>
+                </div>
 
                 <div className={p.hero ? "grid gap-8 lg:grid-cols-[1.2fr_1fr]" : ""}>
                   <div>
@@ -290,7 +390,7 @@ export default function Projects() {
                       type="button"
                       className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-cyan transition-transform group-hover:translate-x-1"
                     >
-                      Explore Project <ArrowRight className="h-4 w-4" />
+                      Open System <ArrowRight className="h-4 w-4" />
                     </button>
                   </div>
 

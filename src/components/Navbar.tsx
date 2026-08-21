@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X, Download } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { Menu, X, Download, Search } from "lucide-react";
 import { profile } from "../data/profile";
+import { system } from "../lib/system";
+import StatusWidget from "./StatusWidget";
 
 const links = [
   { href: "#home", label: "Home" },
@@ -65,10 +67,17 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="hidden items-center gap-2 font-mono text-[10px] tracking-[0.15em] text-mint md:flex">
-            <span className="h-1.5 w-1.5 rounded-full bg-mint [animation:pulse-soft_2.4s_ease-in-out_infinite]" />
-            AVAILABLE FOR OPPORTUNITIES
-          </span>
+          <StatusWidget />
+          <button
+            type="button"
+            onClick={() => system.setPaletteOpen(true)}
+            aria-label="Open command palette (Ctrl+K)"
+            title="Command palette · Ctrl+K"
+            className="flex items-center gap-2 rounded border border-line px-2.5 py-2 text-muted transition-colors hover:border-cyan/40 hover:text-cyan"
+          >
+            <Search className="h-4 w-4" />
+            <kbd className="hidden font-mono text-[9px] tracking-widest lg:block">CTRL K</kbd>
+          </button>
           <a
             href="#contact"
             className="hidden rounded border border-cyan/40 bg-cyan/10 px-4 py-2 text-sm font-medium text-cyan transition-colors hover:bg-cyan/20 xl:block"

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useInView, useReducedMotion } from "framer-motion";
+import { useInView, useReducedMotion } from "motion/react";
 
 /** Animates 0 → target once the ref element enters the viewport. */
 export function useCountUp(target: number, durationMs = 1600) {

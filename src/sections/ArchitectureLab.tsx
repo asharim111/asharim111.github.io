@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import SectionHeading from "../components/SectionHeading";
 import Reveal from "../components/Reveal";
 import { architectures } from "../data/architectures";
+import { system } from "../lib/system";
 
 const kindStyles: Record<string, string> = {
   user: "border-fg/30 text-fg",
@@ -52,7 +53,10 @@ export default function ArchitectureLab() {
               <button
                 key={a.id}
                 type="button"
-                onClick={() => setActive(a.id)}
+                onClick={() => {
+                  setActive(a.id);
+                  system.log(`architecture: rendering ${a.name.toLowerCase()} layout`, "accent");
+                }}
                 aria-pressed={active === a.id}
                 className={`whitespace-nowrap rounded border px-4 py-2 font-mono text-xs tracking-wider transition-colors ${
                   active === a.id
@@ -67,7 +71,7 @@ export default function ArchitectureLab() {
         </Reveal>
 
         <Reveal>
-          <div className="glass relative overflow-hidden rounded-lg p-6 md:p-10">
+          <div className="glass relative overflow-hidden rounded-lg p-6 md:p-10" data-cursor="inspect">
             <div className="grid-bg pointer-events-none absolute inset-0 opacity-50" aria-hidden="true" />
             <AnimatePresence mode="wait">
               <motion.div

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import { MapPin, ChevronDown } from "lucide-react";
 import SectionHeading from "../components/SectionHeading";
 import Reveal from "../components/Reveal";
@@ -162,6 +162,9 @@ export default function ExperienceSection() {
                   </div>
                   <div className="mt-3 pr-6">
                     <div className="font-mono text-xs text-cyan">{t.year}</div>
+                    <div className="mt-0.5 font-mono text-[9px] tracking-[0.25em] text-violet">
+                      {t.phase}
+                    </div>
                     <div className="mt-1 text-sm font-medium text-fg">{t.role}</div>
                     <div className="text-xs text-muted">{t.org}</div>
                   </div>

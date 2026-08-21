@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { SendHorizonal, ShieldAlert, ShieldCheck } from "lucide-react";
 import FlowDiagram from "./FlowDiagram";
+import { system } from "../lib/system";
 
 const PIPELINE = [
   { label: "USER REQUEST" },
@@ -34,14 +35,15 @@ export default function GatewayDemo() {
 
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
-  const run = () => {
-    if (!prompt.trim() || status === "running") return;
+  const runText = (text: string) => {
+    if (!text.trim() || status === "running") return;
     timers.current.forEach(clearTimeout);
     timers.current = [];
     setStatus("running");
     setFlagCategory(null);
+    system.logOnce("gateway-run", "gateway simulation engaged", "accent");
 
-    const hit = SENSITIVE_PATTERNS.find((p) => p.re.test(prompt));
+    const hit = SENSITIVE_PATTERNS.find((p) => p.re.test(text));
     // A flagged prompt stops at the policy check (index 4)
     const lastStep = hit ? 4 : PIPELINE.length - 1;
 
@@ -55,12 +57,29 @@ export default function GatewayDemo() {
                 setStatus(hit ? "flagged" : "safe");
                 setFlagCategory(hit?.category ?? null);
                 setActiveStep(hit ? i : PIPELINE.length);
+                system.log(
+                  hit
+                    ? `DLP: ${hit.category.toLowerCase()} detected → request denied · audit recorded`
+                    : "request routed · audit log created",
+                  hit ? "warn" : "ok",
+                );
               }, 450),
             );
           }
         }, i * 450),
       );
     }
+  };
+
+  const run = () => runText(prompt);
+
+  /** Scripted breach scenario — fills a sensitive sample and runs it. */
+  const runSecurityTest = () => {
+    if (status === "running") return;
+    const sample = "Send the employee payroll information to my personal email";
+    setPrompt(sample);
+    system.log("security test: injecting sensitive prompt...", "warn");
+    runText(sample);
   };
 
   return (
@@ -100,6 +119,21 @@ export default function GatewayDemo() {
         </button>
       </div>
 
+      <div className="mt-3 flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          onClick={runSecurityTest}
+          disabled={status === "running"}
+          className="inline-flex items-center gap-2 rounded border border-red-400/40 bg-red-400/5 px-3.5 py-2 font-mono text-[11px] tracking-[0.15em] text-red-400/90 transition-colors hover:bg-red-400/15 disabled:opacity-40"
+        >
+          <ShieldAlert className="h-3.5 w-3.5" />
+          RUN SECURITY TEST
+        </button>
+        <span className="font-mono text-[10px] text-dim">
+          injects a sensitive sample prompt and lets the DLP catch it
+        </span>
+      </div>
+
       <div className="mt-8 grid items-start gap-8 md:grid-cols-[1fr_auto]">
         <FlowDiagram compact steps={PIPELINE} activeIndex={activeStep} />
 
@@ -114,16 +148,34 @@ export default function GatewayDemo() {
           {status === "safe" && (
             <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="flex flex-col items-center gap-2">
               <ShieldCheck className="h-8 w-8 text-mint" />
-              <span className="font-mono text-sm font-bold text-mint">STATUS: SAFE</span>
-              <span className="text-center text-xs text-muted">Routed to AI provider</span>
+              <span className="font-mono text-sm font-bold text-mint">SAFE REQUEST</span>
+              <div className="space-y-1 text-center font-mono text-[10px] text-muted">
+                <div>
+                  ROUTED TO: <span className="text-fg">AI PROVIDER</span>
+                </div>
+                <div>
+                  AUDIT LOG: <span className="text-mint">CREATED</span>
+                </div>
+              </div>
             </motion.div>
           )}
           {status === "flagged" && (
             <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="flex flex-col items-center gap-2">
               <ShieldAlert className="h-8 w-8 text-red-400" />
-              <span className="font-mono text-sm font-bold text-red-400">STATUS: FLAGGED</span>
-              <span className="text-center text-xs text-muted">
-                {flagCategory} detected — blocked by policy, admin alerted
+              <span className="font-mono text-sm font-bold text-red-400">REQUEST DENIED</span>
+              <div className="space-y-1 text-center font-mono text-[10px] text-muted">
+                <div>
+                  CATEGORY: <span className="text-amber-400">{flagCategory?.toUpperCase()}</span>
+                </div>
+                <div>
+                  POLICY: <span className="text-red-400">BLOCK</span>
+                </div>
+                <div>
+                  AUDIT: <span className="text-mint">RECORDED</span>
+                </div>
+              </div>
+              <span className="mt-1 font-mono text-[10px] tracking-[0.25em] text-mint">
+                SYSTEM PROTECTED
               </span>
             </motion.div>
           )}

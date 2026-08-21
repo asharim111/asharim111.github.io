@@ -87,8 +87,8 @@ export const philosophy = [
 ];
 
 export const careerTimeline = [
-  { year: "2019", role: "PHP Developer Intern", org: "Evolution Co" },
-  { year: "2019–2022", role: "Full Stack Developer", org: "myMRPlace" },
-  { year: "2022–2025", role: "Web Developer", org: "Phoenix Biz Solutions" },
-  { year: "2025–Present", role: "Full Stack Developer", org: "Al Rashed Holdings" },
+  { year: "2019", phase: "BOOTSTRAP", role: "PHP Developer Intern", org: "Evolution Co" },
+  { year: "2019–2022", phase: "SYSTEM DEVELOPMENT", role: "Full Stack Developer", org: "myMRPlace" },
+  { year: "2022–2025", phase: "SCALE", role: "Web Developer", org: "Phoenix Biz Solutions" },
+  { year: "2025–Present", phase: "ENTERPRISE AI", role: "Full Stack Developer", org: "Al Rashed Holdings" },
 ];
