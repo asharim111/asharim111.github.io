@@ -16,7 +16,7 @@ export const profile = {
   phone: "+965 989-70432",
   linkedin: "https://linkedin.com/in/sharim-ansari",
   github: "https://github.com/asharim111",
-  resumeFile: "/Sharim-Ansari-Resume.pdf",
+  resumeFile: `${import.meta.env.BASE_URL}Sharim-Ansari-Resume.pdf`,
   status: "Available for Opportunities",
   intro:
     "Full Stack Developer with 7 years of experience building scalable web applications, enterprise workflow automation systems, procurement platforms, logistics solutions, and AI-powered applications.",
@@ -47,7 +47,12 @@ export const heroMetrics = [
   { value: 3500, suffix: "+", label: "Global Carriers Supported" },
   { value: 19, suffix: "", label: "AI/DLP Detection Categories" },
   { value: 12, suffix: "+", label: "Interactive Analytics Charts" },
-  { value: 25, suffix: "%", label: "Peak Performance Improvement", prefix: "up to " },
+  {
+    value: 25,
+    suffix: "%",
+    label: "Peak Performance Improvement",
+    prefix: "up to ",
+  },
 ];
 
 export const systemMetrics = [
@@ -87,8 +92,28 @@ export const philosophy = [
 ];
 
 export const careerTimeline = [
-  { year: "2019", phase: "BOOTSTRAP", role: "PHP Developer Intern", org: "Evolution Co" },
-  { year: "2019–2022", phase: "SYSTEM DEVELOPMENT", role: "Full Stack Developer", org: "myMRPlace" },
-  { year: "2022–2025", phase: "SCALE", role: "Web Developer", org: "Phoenix Biz Solutions" },
-  { year: "2025–Present", phase: "ENTERPRISE AI", role: "Full Stack Developer", org: "Al Rashed Holdings" },
+  {
+    year: "2019",
+    phase: "BOOTSTRAP",
+    role: "PHP Developer Intern",
+    org: "Evolution Co",
+  },
+  {
+    year: "2019–2022",
+    phase: "SYSTEM DEVELOPMENT",
+    role: "Full Stack Developer",
+    org: "myMRPlace",
+  },
+  {
+    year: "2022–2025",
+    phase: "SCALE",
+    role: "Web Developer",
+    org: "Phoenix Biz Solutions",
+  },
+  {
+    year: "2025–Present",
+    phase: "ENTERPRISE AI",
+    role: "Full Stack Developer",
+    org: "Al Rashed Holdings",
+  },
 ];

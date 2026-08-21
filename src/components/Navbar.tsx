@@ -12,7 +12,7 @@ const links = [
   { href: "#projects", label: "Projects" },
   { href: "#skills", label: "Skills" },
   { href: "#education", label: "Education" },
-  { href: "#publications", label: "Publications" },
+  // { href: "#publications", label: "Publications" },
   { href: "#contact", label: "Contact" },
 ];
 
@@ -45,7 +45,11 @@ export default function Navbar() {
         aria-label="Main navigation"
         className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 md:px-8"
       >
-        <a href="#home" className="flex items-center gap-3" aria-label="Sharim Ansari — home">
+        <a
+          href="#home"
+          className="flex items-center gap-3"
+          aria-label="Sharim Ansari — home"
+        >
           <span className="flex h-9 w-9 items-center justify-center rounded border border-cyan/40 font-display text-sm font-bold text-cyan">
             {profile.logoShort}
           </span>
@@ -76,7 +80,9 @@ export default function Navbar() {
             className="flex items-center gap-2 rounded border border-line px-2.5 py-2 text-muted transition-colors hover:border-cyan/40 hover:text-cyan"
           >
             <Search className="h-4 w-4" />
-            <kbd className="hidden font-mono text-[9px] tracking-widest lg:block">CTRL K</kbd>
+            <kbd className="hidden font-mono text-[9px] tracking-widest lg:block">
+              CTRL K
+            </kbd>
           </button>
           <a
             href="#contact"

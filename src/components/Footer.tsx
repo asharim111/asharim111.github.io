@@ -20,7 +20,9 @@ export default function Footer() {
               <span className="flex h-9 w-9 items-center justify-center rounded border border-cyan/40 font-display text-sm font-bold text-cyan">
                 {profile.logoShort}
               </span>
-              <span className="font-display text-lg font-bold text-fg">SHARIM ANSARI</span>
+              <span className="font-display text-lg font-bold text-fg">
+                SHARIM ANSARI
+              </span>
             </div>
             <p className="mt-3 text-sm text-muted">{profile.title}</p>
             <p className="mt-1 font-mono text-xs text-dim">
@@ -28,9 +30,16 @@ export default function Footer() {
             </p>
           </div>
 
-          <nav aria-label="Footer navigation" className="grid grid-cols-2 gap-x-12 gap-y-2">
+          <nav
+            aria-label="Footer navigation"
+            className="grid grid-cols-2 gap-x-12 gap-y-2"
+          >
             {navLinks.map((l) => (
-              <a key={l.href} href={l.href} className="text-sm text-muted transition-colors hover:text-fg">
+              <a
+                key={l.href}
+                href={l.href}
+                className="text-sm text-muted transition-colors hover:text-fg"
+              >
                 {l.label}
               </a>
             ))}
@@ -66,8 +75,10 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-line pt-6">
-          <span className="font-mono text-xs text-dim">© 2026 Sharim Ansari</span>
-          <span className="font-mono text-xs text-dim">Built with React + TypeScript</span>
+          <span className="font-mono text-xs text-dim">
+            © 2026 Sharim Ansari
+          </span>
+          {/* <span className="font-mono text-xs text-dim">Built with React + TypeScript</span> */}
         </div>
       </div>
     </footer>
