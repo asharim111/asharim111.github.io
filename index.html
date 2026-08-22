@@ -66,6 +66,31 @@
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
+    <!--
+      Counterpart to public/404.html: restores a deep-linked path that the
+      Pages 404 fallback encoded as "?/path". Runs before the app mounts so
+      the router (once one exists) sees the correct URL on first render.
+      Inert while SPA_ROUTES in 404.html is empty.
+    -->
+    <script>
+      (function () {
+        var q = location.search;
+        if (q.charAt(1) !== "/") return;
+        var parts = q.slice(2).split("&");
+        var path = parts[0].replace(/~and~/g, "&");
+        var rest = parts.slice(1).join("&");
+        history.replaceState(
+          null,
+          "",
+          location.pathname.replace(/\/$/, "") +
+            "/" +
+            path +
+            (rest ? "?" + rest : "") +
+            location.hash
+        );
+      })();
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
