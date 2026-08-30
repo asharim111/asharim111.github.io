@@ -16,7 +16,7 @@ export interface Project {
   stack: string[];
   description: string;
   keyAchievement: string;
-  visual: "gateway" | "analytics" | "codereview" | "catalog";
+  visual: "gateway" | "cms" | "analytics" | "codereview" | "catalog";
   hero?: boolean;
   detail: {
     overview: string;
@@ -81,8 +81,55 @@ export const projects: Project[] = [
     },
   },
   {
-    id: "sales-analytics",
+    id: "oil-gas-platform",
     index: "02",
+    name: "Oil & Gas Corporate Platform",
+    subtitle: "Express + PostgreSQL Multi-Company Site with Custom CMS",
+    dates: "Apr 2026 – Present",
+    categories: ["Full Stack", "Enterprise"],
+    stack: [
+      "Node.js",
+      "Express.js",
+      "EJS",
+      "PostgreSQL",
+      "Docker",
+      "Fly.io",
+      "GitHub Actions",
+    ],
+    description:
+      "Server-rendered corporate platform for an oil & gas group of six companies, backed by a relational content model and a schema-driven admin CMS that generates CRUD screens for every content type.",
+    keyAchievement: "10 Admin-Managed Content Types",
+    visual: "cms",
+    detail: {
+      overview:
+        "A multi-page corporate platform for an oil and gas group of six companies — six company sites, three business streams and a full product catalogue served from one Express application, with an admin CMS so content ships without a deployment.",
+      problem:
+        "The group's web presence was a single 2,000-line static HTML page. Six companies, three streams and dozens of products were flattened into one document, product lists were duplicated across sections and drifted apart, and every copy change required a developer and a redeploy.",
+      solution:
+        "Rebuilt as an Express 5 + EJS application on PostgreSQL around a relational content model: a product is entered once, tagged to its company and to the streams it serves, and surfaces automatically on the company page and on every stream page — the two lists can never drift. A schema-driven admin panel generates the list screen, form, validation and delete for all 10 content types from a single resource definition, so a new content type needs no controller and no templates. Numbered SQL migrations, PostgreSQL-backed session auth, image uploads, a read-only JSON API and a health endpoint, containerized and deployed to Fly.io through GitHub Actions.",
+      architecture: [
+        "Visitor / Admin",
+        "Express 5 Router",
+        "Session Auth — connect-pg-simple",
+        "Content Service Layer",
+        "PostgreSQL 18",
+        "EJS Server-Side Rendering",
+        "Docker → Fly.io CI/CD",
+      ],
+      results: [
+        "6 companies, 3 business streams and 5 shared categories driving 21 public routes",
+        "44 products entered once — each surfaces on its company page and every stream tagged to it",
+        "Schema-driven admin panel: 10 content types with CRUD, validation and image uploads from one definition file",
+        "Numbered SQL migrations applied transactionally, so schema changes ship without touching live content",
+        "Containerized with a liveness endpoint and auto-deployed to Fly.io on every push",
+      ],
+      role: "Architect & Full Stack Developer",
+      timeline: "Apr 2026 – Present",
+    },
+  },
+  {
+    id: "sales-analytics",
+    index: "03",
     name: "Sales Analytics Dashboard",
     subtitle: "MERN + SQL Server Business Intelligence Platform",
     dates: "Oct 2025 – Feb 2026",
@@ -116,7 +163,7 @@ export const projects: Project[] = [
   },
   {
     id: "ai-code-reviewer",
-    index: "03",
+    index: "04",
     name: "AI Code Reviewer",
     subtitle: "MERN Application + Google Gemini",
     dates: "Dec 2024 – Feb 2025",
@@ -144,7 +191,7 @@ export const projects: Project[] = [
   },
   {
     id: "pamatec",
-    index: "04",
+    index: "05",
     name: "Pamatec",
     subtitle: "React Product Showcase Platform",
     dates: "Jan 2026 – Jun 2026",

@@ -268,15 +268,126 @@ you took Option B.
 
 - **No control over HTTP headers.** You cannot set CSP, HSTS, or cache-control.
   For a portfolio this is a non-issue; for anything security-sensitive it isn't.
-- **No redirects or rewrites.** No `_redirects` file, no SPA fallback. Fine here
-  (§1.1), but it locks you out of adding client-side routing later without the
-  `404.html` hack.
+- **No redirects or rewrites.** No `_redirects` file, no server-side rewrite rules.
+  ~~Locks you out of client-side routing later.~~ **Addressed** — see §4.1.
 - **No preview deployments.** Every provider in §5 gives you a unique URL per pull
   request. Pages does not.
 - **No server-side anything.** No functions, no forms, no edge logic. If you later
   want a real contact form instead of `mailto:`, you'll need a third-party service
   (Formspree, Web3Forms) or a different host.
 - **Static IP-based CDN**, generally slower TTFB than Cloudflare's edge network.
+
+### 4.1 ✅ Routing fallback — `public/404.html`
+
+GitHub Pages serves `404.html` (with a genuine HTTP 404 status) for any path that
+doesn't exist. `public/404.html` uses that as a three-stage resolver:
+
+| Requested path | Result |
+| --- | --- |
+| `/projects`, `/contact`, … | → `/#projects` — a real anchor on the homepage |
+| A path listed in `SPA_ROUTES` | → encoded, then restored by `index.html` |
+| Anything else | → a branded 404 page, HTTP 404 preserved |
+
+**Why not the standard hack.** The usual `spa-github-pages` snippet routes *every*
+unknown URL into the app. With no router, that renders your homepage under a wrong
+URL — a **soft 404**. Google indexes those as thin duplicates and you lose the real
+"this page doesn't exist" signal. So stage 2 is gated behind an explicit allowlist:
+
+```js
+var SPA_ROUTES = [];   // empty = feature off; unknown URLs stay real 404s
+```
+
+**Stage 1 is a genuine win today.** `github.com/asharim111` visitors who guess
+`/projects` currently hit a dead end; now they land on the right section.
+
+**When you add a router later**, this is the whole migration:
+
+1. Add the route to `SPA_ROUTES` in `public/404.html` (top-level segment only —
+   `"blog"` covers `/blog/any/depth`).
+2. Nothing else. The decoder in `index.html` already restores the path via
+   `history.replaceState` before the app mounts, so the router sees the correct
+   URL on first render. Query strings, hashes, and `&` are handled.
+
+**Verified**, not assumed — 19 unit tests over the resolver and the decoder
+(including round-trips and an XSS case), plus browser runs:
+
+- `/projects` → `/#projects`, app mounts, `#projects` present ✅
+- `/wp-admin/login.php` → URL unchanged, branded 404, app not loaded, `noindex` ✅
+- No horizontal overflow at 360 / 390 / 414 / 768 / 1024 px ✅
+
+### 4.2 Seeing the 404 page locally
+
+Vite's dev server has SPA fallback on by default: **every** unknown path returns
+`index.html` with a `200`, so `public/404.html` never renders locally — visiting
+`localhost:5173/3fdreg` just showed the homepage.
+
+`vite.config.ts` now registers a small `githubPages404()` plugin that reproduces
+Pages' behaviour in both `npm run dev` and `npm run preview`: a navigation to a
+path that doesn't resolve to a real file gets `404.html` with a genuine 404
+status. It only intercepts `Accept: text/html` GET/HEAD requests and checks the
+filesystem first, so Vite's module graph, HMR endpoints, and everything in
+`public/` are untouched.
+
+One deliberate detail: it does **not** exempt paths that merely have an
+extension. An early version did, which let `/wp-admin/login.php` fall through to
+the SPA fallback and return `200` — a soft 404 in dev that production wouldn't
+have produced.
+
+| Local URL | Result |
+| --- | --- |
+| `/` | 200, the app |
+| `/3fdreg` | 404, the diagnostic page |
+| `/projects` | 404 → client-side redirect to `/#projects` |
+| `/favicon.svg`, `/og-image.png`, the résumé PDF | 200 |
+| `/wp-admin/login.php` | 404 |
+
+This required `@types/node` (dev-only) for `fs`/`path` in the config; it isn't in
+the bundle.
+
+### 4.3 Design
+
+The page is a **SHARIM.OS diagnostic screen**, not a generic error page. It reuses
+the site's own idioms so it doesn't read as a different site: the `SA` tile and
+`SHARIM // ANSARI` wordmark from `Navbar`, the gradient headline treatment and
+button styles from `Hero`, the `>_ [ ... ]` terminal prompt, and a panel modelled
+on `BootScreen` (`SHARIM.OS v7.0`, status rows, module checks) that reports the
+failed path instead of a boot sequence.
+
+**Behaviour ported from the app**, so the page feels like the site rather than
+just borrowing its colours:
+
+| Source | What was ported |
+| --- | --- |
+| `ParticleField.tsx` | Constellation canvas — same 0.55 density, 130px link distance, identical colours |
+| `CustomCursor.tsx` | Cyan dot + trailing ring (0.18 lerp), 28 / 40 / 56px for default / hover / labelled, contextual verb over `[data-cursor]` zones |
+| `Magnetic.tsx` | Buttons nudge toward the pointer at 0.18 strength |
+| `index.css` | `::selection` tint, the 10px technical scrollbar, `scroll-behavior`, and the global reduced-motion block |
+
+The route chips are annotated `data-cursor="open"`, so the ring expands and shows
+`OPEN` over them — the same treatment `Projects` (`view`), `Skills` (`details`),
+and `ArchitectureLab` (`inspect`) use.
+
+Note the site does **not** hide the native cursor — the dot and ring are drawn on
+top of it. The port matches that, and uses the same
+`(min-width: 1024px) and (pointer: fine)` gate as `useIsDesktop`, so touch devices
+and small screens get the plain cursor.
+
+It has to be standalone: Pages serves this file directly, so it can't import from
+the React bundle. Everything above is therefore duplicated as plain CSS/JS —
+**if you change the theme colours or these interactions, update `public/404.html`
+too.** All three effects are disabled under `prefers-reduced-motion`.
+
+Two implementation notes:
+
+- The requested path is echoed with `textContent`, never `innerHTML` — it's
+  attacker-controlled, and a 404 page that interpolates `location.pathname` into
+  markup is a stored-XSS vector.
+- If `path` is empty (404.html served *at* the root, meaning `index.html` is
+  missing) it renders the 404 rather than redirecting to `/` — that redirect would
+  loop forever. This was caught by the browser test, not by inspection.
+
+If you move to Option B or a custom domain, update `BASE` at the top of
+`public/404.html` to match `vite.config.ts`.
 
 ---
 
@@ -375,4 +486,5 @@ resume download stops depending on the site sitting at the domain root.
 - [ ] Settings → Pages → Source: **GitHub Actions**
 - [ ] Push to `main`, watch the Actions tab
 - [ ] Open the live URL and test: resume download, favicon, anchor nav, mobile layout
+- [ ] Confirm the 404 fallback live: `/projects` → `/#projects`, `/nope` → 404 page
 - [ ] Run the live URL through LinkedIn Post Inspector and X Card Validator

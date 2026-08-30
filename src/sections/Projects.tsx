@@ -26,6 +26,114 @@ function GatewayVisual() {
   );
 }
 
+/** The platform's defining decision: a product is entered once, tagged to a
+ *  company and its streams, then surfaces on both pages automatically. */
+function CmsVisual() {
+  const inputs = [
+    { label: "COMPANY", cx: 44, x: 4, color: "#3b82f6" },
+    { label: "CATEGORY", cx: 140, x: 98, color: "#8b5cf6" },
+    { label: "STREAM", cx: 236, x: 196, color: "#22d3ee" },
+  ];
+
+  return (
+    <div className="rounded border border-line bg-ink/70 p-4">
+      <div className="mb-3 flex items-center justify-between">
+        <span className="font-mono text-[10px] tracking-[0.15em] text-dim">CONTENT MODEL</span>
+        <span className="font-mono text-[10px] text-mint">ENTER ONCE · SURFACE TWICE</span>
+      </div>
+
+      <svg
+        viewBox="0 0 280 136"
+        className="mx-auto w-full max-w-[360px] font-mono"
+        role="img"
+        aria-label="Content model: company, category and stream feed one product record, which surfaces on both the company page and the stream page"
+      >
+        {/* inputs → product */}
+        {inputs.map(({ label, cx, x, color }) => (
+          <g key={label}>
+            <rect
+              x={x}
+              y={4}
+              width={label === "CATEGORY" ? 84 : 80}
+              height={20}
+              rx="3"
+              fill={`${color}14`}
+              stroke={`${color}80`}
+            />
+            <text
+              x={cx}
+              y={15}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fontSize="9"
+              fill={color}
+            >
+              {label}
+            </text>
+            <line
+              x1={cx}
+              y1={26}
+              x2={cx === 140 ? 140 : cx < 140 ? 128 : 152}
+              y2={56}
+              stroke="rgba(148,163,184,0.3)"
+              strokeWidth="1"
+            />
+          </g>
+        ))}
+
+        {/* the single product record */}
+        <rect x="86" y="58" width="108" height="24" rx="3" fill="rgba(52,211,153,0.1)" stroke="rgba(52,211,153,0.55)" />
+        <text x="140" y="70" textAnchor="middle" dominantBaseline="middle" fontSize="10" fill="#34d399">
+          PRODUCT
+        </text>
+
+        {/* product → the two surfaces it appears on */}
+        {[
+          { x1: 126, x2: 68, href: "/companies/sigs" },
+          { x1: 154, x2: 212, href: "/what-we-do/upstream" },
+        ].map(({ x1, x2, href }) => (
+          <g key={href}>
+            <line
+              x1={x1}
+              y1={84}
+              x2={x2}
+              y2={110}
+              stroke="rgba(52,211,153,0.4)"
+              strokeWidth="1"
+              strokeDasharray="3 3"
+            />
+            <rect
+              x={x2 - 62}
+              y={112}
+              width="124"
+              height="20"
+              rx="3"
+              fill="rgba(13,20,36,0.8)"
+              stroke="rgba(148,163,184,0.3)"
+            />
+            <text
+              x={x2}
+              y={123}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fontSize="9"
+              fill="#8b98ad"
+            >
+              {href}
+            </text>
+          </g>
+        ))}
+      </svg>
+
+      <div className="mt-2 grid grid-cols-3 gap-2 text-center">
+        {["6 Companies", "44 Products", "21 Routes"].map((k) => (
+          <span key={k} className="rounded bg-panel-2 py-1 font-mono text-[9px] text-muted">{k}</span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function AnalyticsVisual() {
   const bars = [42, 68, 55, 80, 62, 91, 74];
   return (
@@ -95,6 +203,7 @@ function CatalogVisual() {
 
 const visuals = {
   gateway: GatewayVisual,
+  cms: CmsVisual,
   analytics: AnalyticsVisual,
   codereview: CodeReviewVisual,
   catalog: CatalogVisual,
@@ -284,6 +393,8 @@ export default function Projects() {
     hoverTimer.current = window.setTimeout(() => {
       if (p.id === "ai-gateway") {
         system.logOnce("hover-gateway", "this is where AI meets enterprise security.", "accent");
+      } else if (p.id === "oil-gas-platform") {
+        system.logOnce("hover-cms", "one record, two surfaces — the content model doing the work.", "accent");
       } else {
         system.logOnce("hover-project", "looks like this one caught your attention.", "info");
       }
@@ -297,7 +408,7 @@ export default function Projects() {
         index="03"
         label="Projects"
         title="Selected Systems"
-        subtitle="Production systems spanning AI governance, business intelligence, developer tooling, and product platforms."
+        subtitle="Production systems spanning AI governance, enterprise content platforms, business intelligence, developer tooling, and product showcases."
       />
 
       {/* Filters */}

@@ -17,6 +17,8 @@ export const experience: Experience[] = [
     stack: [
       "FastAPI",
       "React.js",
+      "Express.js",
+      "EJS",
       "PostgreSQL",
       "Redis",
       "Docker",
@@ -28,6 +30,7 @@ export const experience: Experience[] = [
     highlights: [
       "Architect and build an internal AI gateway (FastAPI, React.js, PostgreSQL, Redis, Docker) that routes employee ChatGPT/Claude usage through a two-layer data loss prevention pipeline.",
       "Enforce Entra ID SSO, department-level policy controls, and audit logging with real-time admin alerting on every flagged prompt.",
+      "Rebuild the group's corporate web presence as a server-rendered Express and PostgreSQL platform with a custom admin CMS, covering six companies, three business streams and a unified product catalogue, containerized and deployed to Fly.io through GitHub Actions.",
       "Design and develop a MERN-based Ticket Management System across IT, business, and procurement modules, centralizing 3+ internal workflows for issue tracking, service requests, and approvals.",
       "Automate 4 procurement workflow stages — Material Requests, Purchase Orders, invoice handling, and ticket closure — reducing manual handoffs and improving operational turnaround.",
       "Build and deploy enterprise automation solutions using Zoho Creator, Zoho Catalyst, REST APIs, and serverless functions to digitize internal workflows and improve cross-department visibility.",

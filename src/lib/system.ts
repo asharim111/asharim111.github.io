@@ -172,12 +172,12 @@ export const SECTION_LOGS: Record<string, Array<[string, ConsoleLine["kind"]]>> 
   ],
   projects: [
     ["loading /projects", "accent"],
-    ["indexing 04 systems", "info"],
+    ["indexing 05 systems", "info"],
     ["architecture modules ready", "ok"],
   ],
   architecture: [
     ["loading /architecture", "accent"],
-    ["05 reference layouts available", "ok"],
+    ["06 reference layouts available", "ok"],
   ],
   "ai-security": [
     ["loading /ai-gateway", "accent"],
