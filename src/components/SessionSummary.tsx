@@ -1,14 +1,7 @@
 import Reveal from "./Reveal";
 import { useSystem } from "../lib/system";
 import { projects } from "../data/projects";
-
-const INTEREST_LABELS: Record<string, string> = {
-  "ai-security": "AI & SECURITY",
-  "full-stack": "FULL STACK",
-  enterprise: "ENTERPRISE SYSTEMS",
-  automation: "AUTOMATION",
-  exploring: "JUST EXPLORING",
-};
+import { JOURNEY_LABELS } from "../data/journeys";
 
 /** Per-session recap shown above the contact CTA — only local, non-sensitive
  *  UI state (which systems were opened, chosen interest). */
@@ -46,7 +39,7 @@ export default function SessionSummary() {
         {interest && (
           <div className="mt-3 flex items-center justify-between border-t border-line pt-3 text-[10px]">
             <span className="tracking-[0.2em] text-muted">INTEREST</span>
-            <span className="text-mint">{INTEREST_LABELS[interest] ?? interest}</span>
+            <span className="text-mint">{JOURNEY_LABELS[interest] ?? interest}</span>
           </div>
         )}
         <div className="mt-3 text-center text-[10px] tracking-[0.25em] text-fg">

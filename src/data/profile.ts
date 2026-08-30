@@ -42,6 +42,44 @@ export const profile = {
   ],
 };
 
+/**
+ * The 15-second version, for the visitor who is deciding whether to spend more
+ * than 15 seconds. Every number here is one that also appears — with its
+ * context — somewhere in the full portfolio; this is a summary, not a second
+ * set of claims.
+ */
+export const briefing = {
+  fit: "Senior full stack engineer for teams building enterprise software with AI in it — where the AI has to pass security review, the workflows have to survive audit, and someone has to own it end to end.",
+  achievements: [
+    {
+      metric: "3,500+",
+      label: "global carriers",
+      detail:
+        "Built a shipment tracking platform delivering live updates across 3,500+ carriers, plus carrier and marketplace API integrations that improved synchronization efficiency by 25%.",
+    },
+    {
+      metric: "19",
+      label: "DLP detection categories",
+      detail:
+        "Architected an enterprise AI gateway routing all employee ChatGPT/Claude usage through two-layer data loss prevention — Microsoft Presidio and an LLM classifier — behind Entra ID SSO and full audit logging.",
+    },
+    {
+      metric: "4",
+      label: "procurement stages automated",
+      detail:
+        "Automated material requests, purchase orders, invoice handling and ticket closure, centralizing 3+ internal workflows across IT, business and procurement in a MERN ticket management system.",
+    },
+  ],
+  strengths: [
+    "MERN · FastAPI · PHP",
+    "PostgreSQL · MongoDB · SQL Server",
+    "AI integration & governance",
+    "Enterprise automation",
+    "AWS · Docker · CI/CD",
+    "Information Security (M.Tech)",
+  ],
+};
+
 export const heroMetrics = [
   { value: 7, suffix: "+", label: "Years Experience" },
   { value: 3500, suffix: "+", label: "Global Carriers Supported" },

@@ -20,7 +20,13 @@ export default function Typewriter({
   const done = count >= text.length;
 
   useEffect(() => {
-    if (reduced) return;
+    if (reduced) {
+      // The media query can flip after mount (system setting changed, or the
+      // hook resolving late). Returning early here used to leave `count` at 0
+      // and render nothing at all — visually empty text.
+      setCount(text.length);
+      return;
+    }
     let i = 0;
     let interval = 0;
     const start = window.setTimeout(() => {

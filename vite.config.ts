@@ -1,8 +1,33 @@
 import { defineConfig, type Plugin, type Connect } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import { execSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
+
+/**
+ * Build provenance, stamped at compile time.
+ *
+ * CI env wins (it is authoritative and survives a shallow checkout); local git
+ * is the fallback; a dev build that has neither still produces something
+ * renderable rather than throwing. GITHUB_RUN_ID is what turns the footer
+ * stamp into a link to the actual deploy run.
+ */
+function git(command: string, fallback: string) {
+  try {
+    return execSync(command, { stdio: ["ignore", "pipe", "ignore"] }).toString().trim() || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+const buildInfo = {
+  sha: (process.env.GITHUB_SHA ?? "").slice(0, 7) || git("git rev-parse --short HEAD", "local"),
+  branch: process.env.GITHUB_REF_NAME ?? git("git rev-parse --abbrev-ref HEAD", "local"),
+  time: new Date().toISOString(),
+  runId: process.env.GITHUB_RUN_ID ?? "",
+  repo: process.env.GITHUB_REPOSITORY ?? "asharim111/asharim-portfolio",
+};
 
 /**
  * Dev/preview parity with GitHub Pages.
@@ -78,6 +103,13 @@ function githubPages404(): Plugin {
 
 export default defineConfig({
   plugins: [react(), tailwindcss(), githubPages404()],
+  define: {
+    __BUILD_SHA__: JSON.stringify(buildInfo.sha),
+    __BUILD_BRANCH__: JSON.stringify(buildInfo.branch),
+    __BUILD_TIME__: JSON.stringify(buildInfo.time),
+    __BUILD_RUN_ID__: JSON.stringify(buildInfo.runId),
+    __BUILD_REPO__: JSON.stringify(buildInfo.repo),
+  },
   build: {
     rollupOptions: {
       output: {

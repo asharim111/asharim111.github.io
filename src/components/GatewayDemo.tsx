@@ -124,7 +124,7 @@ export default function GatewayDemo() {
           type="button"
           onClick={runSecurityTest}
           disabled={status === "running"}
-          className="inline-flex items-center gap-2 rounded border border-red-400/40 bg-red-400/5 px-3.5 py-2 font-mono text-[11px] tracking-[0.15em] text-red-400/90 transition-colors hover:bg-red-400/15 disabled:opacity-40"
+          className="inline-flex items-center gap-2 rounded border border-danger/40 bg-danger/5 px-3.5 py-2 font-mono text-[11px] tracking-[0.15em] text-danger/90 transition-colors hover:bg-danger/15 disabled:opacity-40"
         >
           <ShieldAlert className="h-3.5 w-3.5" />
           RUN SECURITY TEST
@@ -161,14 +161,14 @@ export default function GatewayDemo() {
           )}
           {status === "flagged" && (
             <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="flex flex-col items-center gap-2">
-              <ShieldAlert className="h-8 w-8 text-red-400" />
-              <span className="font-mono text-sm font-bold text-red-400">REQUEST DENIED</span>
+              <ShieldAlert className="h-8 w-8 text-danger" />
+              <span className="font-mono text-sm font-bold text-danger">REQUEST DENIED</span>
               <div className="space-y-1 text-center font-mono text-[10px] text-muted">
                 <div>
-                  CATEGORY: <span className="text-amber-400">{flagCategory?.toUpperCase()}</span>
+                  CATEGORY: <span className="text-warn">{flagCategory?.toUpperCase()}</span>
                 </div>
                 <div>
-                  POLICY: <span className="text-red-400">BLOCK</span>
+                  POLICY: <span className="text-danger">BLOCK</span>
                 </div>
                 <div>
                   AUDIT: <span className="text-mint">RECORDED</span>

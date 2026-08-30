@@ -1,5 +1,18 @@
 @import "tailwindcss";
 
+/**
+ * SHARIM.OS design tokens.
+ *
+ * `@theme` holds the TERMINAL (dark) palette — the default. Tailwind emits
+ * these as custom properties on `:root` inside `@layer theme`, and every
+ * utility compiles to `var(--color-*)`, so the DAYLIGHT palette below only
+ * has to redefine the same variables. Unlayered rules beat layered ones
+ * regardless of specificity, so the override always wins.
+ *
+ * Contrast: `muted` and `dim` carry most of the small mono UI text (9–11px),
+ * so both are tuned to clear WCAG AA (4.5:1) against ink, panel and panel-2
+ * in BOTH themes. `violet` is likewise a text colour, not just a graphic one.
+ */
 @theme {
   --color-ink: #05070d;
   --color-panel: #0a0f1c;
@@ -7,16 +20,72 @@
   --color-line: rgba(148, 163, 184, 0.14);
   --color-line-bright: rgba(148, 163, 184, 0.3);
   --color-fg: #e2e8f0;
-  --color-muted: #8b98ad;
-  --color-dim: #5b6878;
+  --color-muted: #94a3b8; /* 7.9:1 on ink */
+  --color-dim: #79879b; /* 5.3:1 on ink · 4.9:1 on panel-2 */
   --color-cyan: #22d3ee;
   --color-blue: #3b82f6;
-  --color-violet: #8b5cf6;
+  --color-violet: #a78bfa; /* was #8b5cf6 — 4.4:1 failed AA at 9–10px */
   --color-mint: #34d399;
+  /* Status colours as tokens, so they survive the theme swap. Tailwind's
+     amber-400 / red-400 are unreadable on a light ground. */
+  --color-warn: #fbbf24;
+  --color-danger: #f87171;
+  --color-pink: #f472b6;
 
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Space Grotesk", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* Non-palette surface tokens — referenced by the utilities below and read at
+   runtime by the particle canvas, so both themes stay in sync automatically. */
+:root {
+  color-scheme: dark;
+  --glass-bg: rgba(13, 20, 36, 0.6);
+  --glass-blur: 14px;
+  --grid-line: rgba(148, 163, 184, 0.045);
+  --scroll-track: #05070d;
+  --scroll-thumb: #1e293b;
+  --scroll-thumb-hover: #334155;
+  --selection: rgba(34, 211, 238, 0.25);
+  --shadow-ambient: 0 12px 34px rgba(0, 0, 0, 0.45);
+  --shadow-panel: 0 24px 60px rgba(0, 0, 0, 0.6);
+  --particle-dot: rgba(34, 211, 238, 0.45);
+  --particle-link: 56, 130, 246;
+  --particle-link-alpha: 0.14;
+}
+
+/* DAYLIGHT — the light/high-contrast counterpart. Same structure, same
+   hierarchy (fg > muted > dim), inverted ground. */
+:root[data-theme="daylight"] {
+  color-scheme: light;
+  --color-ink: #eef2f7;
+  --color-panel: #f8fafc;
+  --color-panel-2: #e6edf6;
+  --color-line: rgba(15, 23, 42, 0.12);
+  --color-line-bright: rgba(15, 23, 42, 0.26);
+  --color-fg: #0b1220;
+  --color-muted: #47566b; /* 6.6:1 on ink */
+  --color-dim: #5a6a80; /* 4.9:1 on ink */
+  --color-cyan: #0e7490; /* 4.8:1 on ink */
+  --color-blue: #1d4ed8;
+  --color-violet: #6d28d9;
+  --color-mint: #047857;
+  --color-warn: #854d0e; /* 6.1:1 — #a16207 measured 4.38:1 and failed AA */
+  --color-danger: #b91c1c;
+  --color-pink: #be185d;
+
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --grid-line: rgba(15, 23, 42, 0.05);
+  --scroll-track: #e6edf6;
+  --scroll-thumb: #c2cedd;
+  --scroll-thumb-hover: #a3b3c7;
+  --selection: rgba(14, 116, 144, 0.2);
+  --shadow-ambient: 0 12px 30px rgba(15, 23, 42, 0.12);
+  --shadow-panel: 0 24px 50px rgba(15, 23, 42, 0.16);
+  --particle-dot: rgba(14, 116, 144, 0.4);
+  --particle-link: 29, 78, 216;
+  --particle-link-alpha: 0.1;
 }
 
 html {
@@ -30,10 +99,13 @@ body {
   font-family: var(--font-sans);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  /* Swapping display profile fades rather than snapping. Transitions never
+     run on the first paint, so this cannot cause a load-time flash. */
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 ::selection {
-  background: rgba(34, 211, 238, 0.25);
+  background: var(--selection);
 }
 
 /* Thin technical scrollbar */
@@ -41,28 +113,44 @@ body {
   width: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-ink);
+  background: var(--scroll-track);
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: var(--scroll-thumb);
   border-radius: 6px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: var(--scroll-thumb-hover);
 }
 
-/* Visible keyboard focus */
-:focus-visible {
+/* Visible keyboard focus. `:focus-visible` alone loses to some component-level
+   `focus:outline-none`, so the ring is also forced on anything focusable that
+   opts out — the magnetic/cursor layers must never swallow it. */
+:focus-visible,
+a:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
   outline: 2px solid var(--color-cyan);
   outline-offset: 2px;
   border-radius: 2px;
 }
 
 @utility glass {
-  background: rgba(13, 20, 36, 0.6);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--color-line);
+}
+
+/* Floating surfaces (dock, console, palette) — theme-aware elevation. */
+@utility elev {
+  box-shadow: var(--shadow-ambient);
+}
+@utility elev-panel {
+  box-shadow: var(--shadow-panel);
 }
 
 @utility tech-label {
@@ -75,8 +163,8 @@ body {
 
 @utility grid-bg {
   background-image:
-    linear-gradient(rgba(148, 163, 184, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 163, 184, 0.045) 1px, transparent 1px);
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
   background-size: 44px 44px;
 }
 
@@ -130,5 +218,12 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* The floating dock and overlays are screen furniture — never printed. */
+@media print {
+  [data-print="hide"] {
+    display: none !important;
   }
 }

@@ -53,7 +53,7 @@ export default function Education() {
         {certifications.map((c, i) => (
           <Reveal key={c.name} delay={i * 0.05}>
             <div className="glass flex h-full items-start gap-3 rounded-lg p-5 transition-colors hover:border-line-bright">
-              <Award className="mt-0.5 h-5 w-5 shrink-0 text-amber-400/80" />
+              <Award className="mt-0.5 h-5 w-5 shrink-0 text-warn/80" />
               <div>
                 <div className="text-sm font-medium leading-snug text-fg">{c.name}</div>
                 <div className="mt-1.5 font-mono text-[11px] text-muted">{c.issuer}</div>

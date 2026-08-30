@@ -1,68 +1,18 @@
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ListRestart } from "lucide-react";
 import Reveal from "./Reveal";
 import { system, useSystem } from "../lib/system";
+import { JOURNEYS } from "../data/journeys";
+import { goToSection } from "../lib/navigate";
 
-interface Journey {
-  id: string;
-  label: string;
-  steps: Array<{ label: string; href: string }>;
-}
-
-const JOURNEYS: Journey[] = [
-  {
-    id: "ai-security",
-    label: "AI & SECURITY",
-    steps: [
-      { label: "AI Gateway", href: "#projects" },
-      { label: "DLP Pipeline", href: "#ai-security" },
-      { label: "Architecture", href: "#architecture" },
-      { label: "Contact", href: "#contact" },
-    ],
-  },
-  {
-    id: "full-stack",
-    label: "FULL STACK",
-    steps: [
-      { label: "Experience", href: "#experience" },
-      { label: "Projects", href: "#projects" },
-      { label: "Tech Stack", href: "#skills" },
-      { label: "Contact", href: "#contact" },
-    ],
-  },
-  {
-    id: "enterprise",
-    label: "ENTERPRISE SYSTEMS",
-    steps: [
-      { label: "Automation", href: "#experience" },
-      { label: "Logistics", href: "#experience" },
-      { label: "AI Gateway", href: "#projects" },
-      { label: "Contact", href: "#contact" },
-    ],
-  },
-  {
-    id: "automation",
-    label: "AUTOMATION",
-    steps: [
-      { label: "Experience", href: "#experience" },
-      { label: "Architecture", href: "#architecture" },
-      { label: "Skills", href: "#skills" },
-      { label: "Contact", href: "#contact" },
-    ],
-  },
-  {
-    id: "exploring",
-    label: "JUST EXPLORING",
-    steps: [
-      { label: "About", href: "#about" },
-      { label: "Selected Systems", href: "#projects" },
-      { label: "Try the AI Gateway", href: "#ai-security" },
-    ],
-  },
-];
-
-/** Personalization strip: the visitor picks an interest and gets a
- *  recommended route through the portfolio. Stored per-session only. */
+/**
+ * Personalization strip.
+ *
+ * Picking an interest no longer only *suggests* a route — it resequences the
+ * page beneath this strip and swaps the hero sub-headline, so the first thing
+ * the visitor scrolls into is the thing they came for. Stored as a preference,
+ * so the order holds on the next visit too.
+ */
 export default function InterestSelector() {
   const interest = useSystem((s) => s.interest);
   const journey = JOURNEYS.find((j) => j.id === interest);
@@ -90,6 +40,15 @@ export default function InterestSelector() {
                 </button>
               ))}
             </div>
+            {interest && (
+              <button
+                type="button"
+                onClick={() => system.setInterest(null)}
+                className="ml-auto inline-flex items-center gap-1.5 font-mono text-[10px] tracking-[0.15em] text-dim transition-colors hover:text-fg"
+              >
+                <ListRestart className="h-3 w-3" /> RESET ORDER
+              </button>
+            )}
           </div>
         </Reveal>
 
@@ -104,12 +63,16 @@ export default function InterestSelector() {
             >
               <div className="flex flex-wrap items-center gap-2 pt-5">
                 <span className="font-mono text-[10px] tracking-[0.2em] text-dim">
-                  RECOMMENDED ROUTE
+                  SECTIONS RESEQUENCED
                 </span>
                 {journey.steps.map((s, i) => (
                   <span key={`${s.label}-${i}`} className="flex items-center gap-2">
                     <a
                       href={s.href}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        goToSection(s.href.replace("#", ""));
+                      }}
                       className="rounded border border-mint/30 bg-mint/5 px-3 py-1.5 font-mono text-[10px] text-mint transition-colors hover:bg-mint/15"
                     >
                       {s.label}

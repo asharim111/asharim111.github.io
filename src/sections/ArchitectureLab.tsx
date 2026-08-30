@@ -10,9 +10,9 @@ const kindStyles: Record<string, string> = {
   app: "border-cyan/40 text-cyan",
   service: "border-blue/40 text-blue",
   data: "border-mint/40 text-mint",
-  infra: "border-amber-400/40 text-amber-400",
+  infra: "border-warn/40 text-warn",
   security: "border-violet/40 text-violet",
-  ai: "border-pink-400/40 text-pink-400",
+  ai: "border-pink/40 text-pink",
 };
 
 /** Animated dots travelling down the diagram spine while a layout is displayed. */

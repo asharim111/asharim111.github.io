@@ -1,12 +1,15 @@
 import { useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ArrowRight, Download, Terminal } from "lucide-react";
+import { ArrowRight, Download, IdCard, Terminal } from "lucide-react";
 import { profile } from "../data/profile";
+import { heroHeadline } from "../data/journeys";
 import ParticleField from "../components/ParticleField";
 import Typewriter from "../components/Typewriter";
 import Magnetic from "../components/Magnetic";
 import EnterSystem from "../components/EnterSystem";
-import { system } from "../lib/system";
+import { system, useSystem } from "../lib/system";
+import { onResumeDownload } from "../lib/contact";
+import { useGatewayCycle, GATEWAY_STAGES } from "../hooks/useGatewayCycle";
 
 const ORBIT_TECHS = [
   ["React", "Node.js", "Python", "PHP"],
@@ -14,32 +17,76 @@ const ORBIT_TECHS = [
   ["AI", "API", "Security"],
 ];
 
-const STATUS_PANELS = [
-  { label: "SYSTEM STATUS", value: "ONLINE", tone: "text-mint", pos: "left-0 top-6" },
-  { label: "AI GATEWAY", value: "ACTIVE", tone: "text-cyan", pos: "right-0 top-16" },
-  { label: "API SERVICES", value: "12+", tone: "text-blue", pos: "left-2 bottom-20" },
-  { label: "AUTOMATION", value: "RUNNING", tone: "text-violet", pos: "right-4 bottom-8" },
-];
+/** Tone → classes. Every variant is spelled out: Tailwind scans source text,
+ *  so a class assembled at runtime (`border-cyan/70`.replace(…)) would never be
+ *  generated and the element would render unstyled. */
+const TONES = {
+  cyan: {
+    text: "text-cyan",
+    ring: "border-cyan/70",
+    ringIdle: "border-cyan/35",
+    chip: "border-cyan/50",
+    glow: "shadow-[0_0_90px_rgba(34,211,238,0.30)]",
+    dot: "bg-cyan",
+  },
+  blue: {
+    text: "text-blue",
+    ring: "border-blue/70",
+    ringIdle: "border-blue/35",
+    chip: "border-blue/50",
+    glow: "shadow-[0_0_90px_rgba(59,130,246,0.28)]",
+    dot: "bg-blue",
+  },
+  violet: {
+    text: "text-violet",
+    ring: "border-violet/70",
+    ringIdle: "border-violet/35",
+    chip: "border-violet/50",
+    glow: "shadow-[0_0_90px_rgba(167,139,250,0.28)]",
+    dot: "bg-violet",
+  },
+  mint: {
+    text: "text-mint",
+    ring: "border-mint/70",
+    ringIdle: "border-mint/35",
+    chip: "border-mint/50",
+    glow: "shadow-[0_0_90px_rgba(52,211,153,0.28)]",
+    dot: "bg-mint",
+  },
+} as const;
 
-/** Orbital "AI / Enterprise Architecture Core" — CSS/SVG, no WebGL needed.
- *  Clicking the core briefly "expands the system". */
+/**
+ * Orbital "AI / Enterprise Architecture Core".
+ *
+ * The rings no longer just spin: the core steps through the real gateway
+ * pipeline — request, identity, DLP scan, classification, policy, routing,
+ * audited response — and the orbit ring belonging to the active stage lights
+ * with it. The hero demonstrates the system instead of decorating around it.
+ * Clicking the core still "expands the system".
+ */
 function AICore() {
   const reduced = useReducedMotion();
   const ringSizes = [220, 320, 420];
   const [expanded, setExpanded] = useState(false);
   const expandTimer = useRef(0);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const { stage, index, total, frozen } = useGatewayCycle(rootRef);
+
+  const tone = TONES[stage.tone];
+  const label = frozen ? "CORE" : stage.core;
 
   const activate = () => {
     if (expanded) return;
     setExpanded(true);
     system.logOnce("core-expand", "core interaction detected", "accent");
-    system.log("SYSTEM EXPANDED", "ok");
+    system.log(`SYSTEM EXPANDED · ${stage.panel.toLowerCase()}`, "ok");
     window.clearTimeout(expandTimer.current);
     expandTimer.current = window.setTimeout(() => setExpanded(false), 1300);
   };
 
   return (
     <div
+      ref={rootRef}
       className={`relative mx-auto aspect-square w-full max-w-[420px] transition-transform duration-500 ease-out lg:max-w-[480px] ${
         expanded && !reduced ? "scale-[1.06]" : ""
       }`}
@@ -57,82 +104,110 @@ function AICore() {
         <button
           type="button"
           onClick={activate}
-          aria-label="Expand the system core"
+          aria-label={`Expand the system core — pipeline stage ${index + 1} of ${total}: ${stage.panel}`}
           className={`relative flex h-28 w-28 items-center justify-center rounded-full border bg-panel-2 transition-all duration-500 ${
-            expanded
-              ? "border-cyan/70 shadow-[0_0_90px_rgba(34,211,238,0.35)]"
-              : "border-cyan/30 shadow-[0_0_60px_rgba(34,211,238,0.15)]"
+            expanded ? `${tone.ring} ${tone.glow}` : `${tone.ringIdle} shadow-[0_0_60px_rgba(34,211,238,0.14)]`
           }`}
         >
           <div className="absolute inset-2 rounded-full border border-blue/25 [animation:spin-slow_14s_linear_infinite]">
-            <span className="absolute -top-0.5 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-cyan" />
+            <span className={`absolute -top-0.5 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full transition-colors duration-500 ${tone.dot}`} />
           </div>
           <div className="absolute inset-5 rounded-full border border-violet/25 [animation:spin-slow-reverse_10s_linear_infinite]">
-            <span className="absolute -bottom-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-violet" />
+            <span className={`absolute -bottom-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full transition-colors duration-500 ${tone.dot}`} />
           </div>
-          <span className="font-mono text-[10px] tracking-[0.2em] text-cyan">
-            {expanded ? "ACTIVE" : "CORE"}
+          <span className={`font-mono text-[10px] tracking-[0.2em] transition-colors duration-300 ${tone.text}`}>
+            {expanded ? "ACTIVE" : label}
           </span>
         </button>
-        <AnimatePresence>
-          {expanded && (
+
+        {/* Stage readout — the pipeline narrating itself */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 top-full mt-3 w-56 -translate-x-1/2 text-center font-mono"
+        >
+          <AnimatePresence mode="wait">
             <motion.div
-              initial={{ opacity: 0, y: 6 }}
+              key={expanded ? "expanded" : stage.id}
+              initial={reduced ? false : { opacity: 0, y: 4 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="pointer-events-none absolute left-1/2 top-full mt-3 -translate-x-1/2 whitespace-nowrap font-mono text-[9px] tracking-[0.3em] text-cyan"
-              aria-hidden="true"
+              exit={reduced ? undefined : { opacity: 0, y: -4 }}
+              transition={{ duration: 0.25 }}
+              className={`text-[9px] tracking-[0.24em] ${tone.text}`}
             >
-              SYSTEM EXPANDED
+              {expanded ? "SYSTEM EXPANDED" : frozen ? "PIPELINE READY" : stage.panel}
             </motion.div>
+          </AnimatePresence>
+          {!frozen && (
+            <div className="mt-2 flex justify-center gap-1">
+              {GATEWAY_STAGES.map((s, i) => (
+                <span
+                  key={s.id}
+                  className={`h-0.5 w-4 rounded-full transition-colors duration-300 ${
+                    i === index ? tone.dot : i < index ? "bg-line-bright" : "bg-line"
+                  }`}
+                />
+              ))}
+            </div>
           )}
-        </AnimatePresence>
+        </div>
       </div>
 
-      {/* Orbiting technology chips */}
-      {ringSizes.map((size, ring) => (
-        <div
-          key={size}
-          aria-hidden="true"
-          className="absolute left-1/2 top-1/2 rounded-full border border-line"
-          style={{
-            width: size,
-            height: size,
-            marginLeft: -size / 2,
-            marginTop: -size / 2,
-            animation: reduced
-              ? undefined
-              : `${ring % 2 === 0 ? "spin-slow" : "spin-slow-reverse"} ${34 + ring * 16}s linear infinite`,
-          }}
-        >
-          {ORBIT_TECHS[ring].map((tech, i) => {
-            const angle = (i / ORBIT_TECHS[ring].length) * 360;
-            return (
-              <div
-                key={tech}
-                className="absolute left-1/2 top-1/2"
-                style={{
-                  transform: `rotate(${angle}deg) translateY(${-size / 2}px) rotate(${-angle}deg)`,
-                }}
-              >
-                <span
-                  className="block -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded border border-line bg-panel px-2 py-1 font-mono text-[10px] text-muted"
+      {/* Orbiting technology chips — the ring carrying the active stage lifts */}
+      {ringSizes.map((size, ring) => {
+        const live = !frozen && stage.ring === ring;
+        return (
+          <div
+            key={size}
+            aria-hidden="true"
+            className={`absolute left-1/2 top-1/2 rounded-full border transition-colors duration-500 ${
+              live ? "border-line-bright" : "border-line"
+            }`}
+            style={{
+              width: size,
+              height: size,
+              marginLeft: -size / 2,
+              marginTop: -size / 2,
+              animation: reduced
+                ? undefined
+                : `${ring % 2 === 0 ? "spin-slow" : "spin-slow-reverse"} ${34 + ring * 16}s linear infinite`,
+            }}
+          >
+            {ORBIT_TECHS[ring].map((tech, i) => {
+              const angle = (i / ORBIT_TECHS[ring].length) * 360;
+              return (
+                <div
+                  key={tech}
+                  className="absolute left-1/2 top-1/2"
                   style={{
-                    animation: reduced
-                      ? undefined
-                      : `${ring % 2 === 0 ? "spin-slow-reverse" : "spin-slow"} ${34 + ring * 16}s linear infinite`,
+                    transform: `rotate(${angle}deg) translateY(${-size / 2}px) rotate(${-angle}deg)`,
                   }}
                 >
-                  {tech}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      ))}
+                  <span
+                    className={`block -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded border px-2 py-1 font-mono text-[10px] transition-colors duration-500 ${
+                      live ? `${tone.chip} bg-panel-2 ${tone.text}` : "border-line bg-panel text-muted"
+                    }`}
+                    style={{
+                      animation: reduced
+                        ? undefined
+                        : `${ring % 2 === 0 ? "spin-slow-reverse" : "spin-slow"} ${34 + ring * 16}s linear infinite`,
+                    }}
+                  >
+                    {tech}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        );
+      })}
 
-      {/* Floating status panels */}
-      {STATUS_PANELS.map((p, i) => (
+      {/* Floating status panels — two are live, two are steady state */}
+      {[
+        { label: "SYSTEM STATUS", value: "ONLINE", tone: "text-mint", pos: "left-0 top-6" },
+        { label: "AI GATEWAY", value: frozen ? "READY" : stage.core, tone: tone.text, pos: "right-0 top-16" },
+        { label: "PIPELINE", value: frozen ? `${total} STAGES` : `${index + 1} / ${total}`, tone: "text-blue", pos: "left-2 bottom-20" },
+        { label: "AUTOMATION", value: "RUNNING", tone: "text-violet", pos: "right-4 bottom-8" },
+      ].map((p, i) => (
         <motion.div
           key={p.label}
           aria-hidden="true"
@@ -155,6 +230,7 @@ export default function Hero() {
   const reduced = useReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
   const [entering, setEntering] = useState(false);
+  const interest = useSystem((s) => s.interest);
 
   // Mouse-follow parallax + tilt on the core — the architecture leans with the cursor
   const coreRef = useRef<HTMLDivElement>(null);
@@ -199,14 +275,22 @@ export default function Hero() {
             </span>
           </motion.h1>
 
-          <motion.p
-            initial={reduced ? false : { opacity: 0, y: 22 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-6 max-w-xl text-base leading-relaxed text-muted md:text-lg"
-          >
-            {profile.subheadline}
-          </motion.p>
+          {/* Sub-headline follows the chosen journey — same person, framed for
+              the reader who just told us what they came for. */}
+          <div className="mt-6 min-h-[3.5rem] max-w-xl">
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={interest ?? "default"}
+                initial={reduced ? false : { opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduced ? undefined : { opacity: 0, y: -8 }}
+                transition={{ duration: 0.35 }}
+                className="text-base leading-relaxed text-muted md:text-lg"
+              >
+                {heroHeadline(interest)}
+              </motion.p>
+            </AnimatePresence>
+          </div>
 
           <motion.div
             initial={reduced ? false : { opacity: 0, y: 22 }}
@@ -214,7 +298,7 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="mt-5 font-mono text-xs tracking-[0.22em] text-dim"
           >
-            7+ YEARS EXPERIENCE · {profile.location.toUpperCase()}
+            {profile.yearsExperience} YEARS EXPERIENCE · {profile.location.toUpperCase()}
           </motion.div>
 
           <motion.div
@@ -242,6 +326,7 @@ export default function Hero() {
             <a
               href={profile.resumeFile}
               download
+              onClick={() => onResumeDownload("hero")}
               className="inline-flex items-center gap-2 px-2 py-3 text-sm text-muted transition-colors hover:text-fg"
             >
               <Download className="h-4 w-4" /> Download Resume
@@ -252,7 +337,7 @@ export default function Hero() {
             initial={reduced ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.55 }}
-            className="mt-6"
+            className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3"
           >
             <button
               type="button"
@@ -260,6 +345,14 @@ export default function Hero() {
               className="inline-flex items-center gap-2 font-mono text-[11px] tracking-[0.25em] text-dim transition-colors hover:text-cyan"
             >
               <Terminal className="h-3.5 w-3.5" /> [ ENTER SYSTEM → ]
+            </button>
+            {/* The opposite of Discovery Mode: for the visitor with 15 seconds. */}
+            <button
+              type="button"
+              onClick={() => system.setRecruiterOpen(true)}
+              className="inline-flex items-center gap-2 font-mono text-[11px] tracking-[0.25em] text-dim transition-colors hover:text-mint"
+            >
+              <IdCard className="h-3.5 w-3.5" /> [ 15-SECOND BRIEFING ]
             </button>
           </motion.div>
 
@@ -272,8 +365,8 @@ export default function Hero() {
             aria-hidden="true"
           >
             <div className="mb-2 flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-red-400/50" />
-              <span className="h-2 w-2 rounded-full bg-amber-400/50" />
+              <span className="h-2 w-2 rounded-full bg-danger/50" />
+              <span className="h-2 w-2 rounded-full bg-warn/50" />
               <span className="h-2 w-2 rounded-full bg-mint/50" />
               <span className="ml-2 text-[9px] text-dim">engineer.ts</span>
             </div>

@@ -1,24 +1,28 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { Menu, X, Download, Search } from "lucide-react";
+import { IdCard, Menu, X, Download, Moon, Search, Sun } from "lucide-react";
 import { profile } from "../data/profile";
-import { system } from "../lib/system";
+import { system, useSystem } from "../lib/system";
+import { onResumeDownload } from "../lib/contact";
+import { goToSection } from "../lib/navigate";
+import { useScrollLock } from "../hooks/useScrollLock";
 import StatusWidget from "./StatusWidget";
+import WhatsAppButton from "./WhatsAppButton";
 
 const links = [
   { href: "#home", label: "Home" },
   { href: "#about", label: "About" },
   { href: "#experience", label: "Experience" },
   { href: "#projects", label: "Projects" },
-  { href: "#skills", label: "Skills" },
+  // { href: "#skills", label: "Skills" },
   { href: "#education", label: "Education" },
-  // { href: "#publications", label: "Publications" },
   { href: "#contact", label: "Contact" },
 ];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const theme = useSystem((s) => s.theme);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -27,18 +31,23 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Prevent background scroll while the mobile menu is open
+  // Shared, reference-counted — see useScrollLock for why this isn't a direct
+  // write to body.style.overflow any more.
+  useScrollLock(open);
+
+  // Escape closes the drawer, like every other overlay on the site.
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
   return (
     <header
+      data-print="hide"
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-        scrolled ? "glass shadow-lg shadow-black/30" : "bg-transparent"
+        scrolled ? "glass elev" : "bg-transparent"
       }`}
     >
       <nav
@@ -47,6 +56,10 @@ export default function Navbar() {
       >
         <a
           href="#home"
+          onClick={(e) => {
+            e.preventDefault();
+            goToSection("home");
+          }}
           className="flex items-center gap-3"
           aria-label="Sharim Ansari — home"
         >
@@ -63,6 +76,10 @@ export default function Navbar() {
             <a
               key={l.href}
               href={l.href}
+              onClick={(e) => {
+                e.preventDefault();
+                goToSection(l.href.slice(1));
+              }}
               className="rounded px-3 py-2 text-sm text-muted transition-colors hover:text-fg"
             >
               {l.label}
@@ -72,6 +89,27 @@ export default function Navbar() {
 
         <div className="flex items-center gap-3">
           <StatusWidget />
+
+          <button
+            type="button"
+            onClick={() => system.toggleTheme()}
+            aria-label={
+              theme === "terminal"
+                ? "Switch to daylight profile"
+                : "Switch to terminal profile"
+            }
+            title={
+              theme === "terminal" ? "Daylight profile" : "Terminal profile"
+            }
+            className="rounded border border-line p-2 text-muted transition-colors hover:border-cyan/40 hover:text-cyan"
+          >
+            {theme === "terminal" ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
+          </button>
+
           <button
             type="button"
             onClick={() => system.setPaletteOpen(true)}
@@ -84,12 +122,18 @@ export default function Navbar() {
               CTRL K
             </kbd>
           </button>
+
           <a
             href="#contact"
+            onClick={(e) => {
+              e.preventDefault();
+              goToSection("contact");
+            }}
             className="hidden rounded border border-cyan/40 bg-cyan/10 px-4 py-2 text-sm font-medium text-cyan transition-colors hover:bg-cyan/20 xl:block"
           >
             Let's Connect →
           </a>
+
           <button
             type="button"
             aria-label={open ? "Close menu" : "Open menu"}
@@ -116,23 +160,57 @@ export default function Navbar() {
                 <a
                   key={l.href}
                   href={l.href}
-                  onClick={() => setOpen(false)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setOpen(false);
+                    goToSection(l.href.slice(1));
+                  }}
                   className="rounded px-3 py-3 text-base text-fg transition-colors hover:bg-panel-2"
                 >
                   {l.label}
                 </a>
               ))}
+
+              {/* Mobile is where WhatsApp actually gets used — it belongs in
+                  the drawer, not only behind a floating button. */}
+              <WhatsAppButton
+                placement="nav-drawer"
+                variant="row"
+                label="Message on WhatsApp"
+                className="mt-2"
+                onDone={() => setOpen(false)}
+              />
+
               <a
                 href={profile.resumeFile}
                 download
-                onClick={() => setOpen(false)}
-                className="mt-2 flex items-center gap-2 rounded border border-line px-3 py-3 text-base text-fg"
+                onClick={() => {
+                  setOpen(false);
+                  onResumeDownload("nav-drawer");
+                }}
+                className="mt-1 flex items-center gap-2 rounded border border-line px-3 py-3 text-base text-fg"
               >
                 <Download className="h-4 w-4" /> Download Resume
               </a>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  system.setRecruiterOpen(true);
+                }}
+                className="mt-1 flex items-center gap-2 rounded border border-line px-3 py-3 text-left text-base text-fg"
+              >
+                <IdCard className="h-4 w-4" /> 15-Second Briefing
+              </button>
+
               <a
                 href="#contact"
-                onClick={() => setOpen(false)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setOpen(false);
+                  goToSection("contact");
+                }}
                 className="mt-1 rounded border border-cyan/40 bg-cyan/10 px-3 py-3 text-center text-base font-medium text-cyan"
               >
                 Let's Connect →

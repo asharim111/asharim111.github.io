@@ -1,20 +1,31 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { system, useSystem } from "../lib/system";
+import { system } from "../lib/system";
+import { useScrollLock } from "../hooks/useScrollLock";
 
 const MODULES = ["AI MODULE", "API ENGINE", "SECURITY", "AUTOMATION"];
 
-/** ~1.8s cinematic boot sequence. Plays once per browser session, is
- *  skippable (click / Esc / Enter), and is skipped entirely under
- *  prefers-reduced-motion. */
+/** ~1.7s cinematic boot sequence. Plays once per *visitor* (the flag lives in
+ *  localStorage now, so a second tab doesn't replay it), is skippable
+ *  (click / Esc / Enter), and is skipped entirely under prefers-reduced-motion. */
 export default function BootScreen() {
   const reduced = useReducedMotion();
-  const booted = useSystem((s) => s.booted);
   const [progress, setProgress] = useState(0);
   const [moduleCount, setModuleCount] = useState(0);
   const [done, setDone] = useState(false);
 
-  const skip = booted || reduced;
+  /**
+   * Captured once, on first render.
+   *
+   * This used to read `booted` live from the store — so the moment the
+   * sequence finished and called `markBooted()`, `skip` flipped true, the
+   * component returned null, and the blur-out exit animation never played: the
+   * screen vanished on a hard cut. The decision to show the boot at all is a
+   * mount-time decision, so it's frozen here.
+   */
+  const skip = useRef(system.get().booted || reduced).current;
+
+  useScrollLock(!skip && !done);
 
   useEffect(() => {
     if (skip) {
@@ -27,12 +38,19 @@ export default function BootScreen() {
       return;
     }
 
-    document.body.style.overflow = "hidden";
     system.log("initializing Sharim's engineering environment...", "info");
 
     const t0 = performance.now();
     let raf = 0;
+    let finishTimer = 0;
     const DURATION = 1250;
+
+    const finish = () => {
+      setDone(true);
+      system.markBooted();
+      system.log("access granted. welcome, visitor.", "ok");
+    };
+
     const tick = (now: number) => {
       const t = Math.min((now - t0) / DURATION, 1);
       setProgress(Math.round(t * 100));
@@ -40,18 +58,14 @@ export default function BootScreen() {
       if (t < 1) raf = requestAnimationFrame(tick);
       else finishTimer = window.setTimeout(finish, 420);
     };
-    let finishTimer = 0;
     raf = requestAnimationFrame(tick);
 
-    const finish = () => {
-      setDone(true);
-      system.markBooted();
-      system.log("access granted. welcome, visitor.", "ok");
-      document.body.style.overflow = "";
-    };
-
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" || e.key === "Enter") finish();
+      if (e.key === "Escape" || e.key === "Enter") {
+        cancelAnimationFrame(raf);
+        clearTimeout(finishTimer);
+        finish();
+      }
     };
     window.addEventListener("keydown", onKey);
 
@@ -59,9 +73,7 @@ export default function BootScreen() {
       cancelAnimationFrame(raf);
       clearTimeout(finishTimer);
       window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [skip]);
 
   if (skip) return null;
@@ -78,7 +90,6 @@ export default function BootScreen() {
           onClick={() => {
             setDone(true);
             system.markBooted();
-            document.body.style.overflow = "";
           }}
         >
           <div className="grid-bg pointer-events-none absolute inset-0 opacity-40" aria-hidden="true" />

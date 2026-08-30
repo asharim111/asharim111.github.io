@@ -17,6 +17,35 @@
     <meta name="author" content="Sharim Ansari" />
     <meta name="theme-color" content="#05070d" />
 
+    <!--
+      Display profile, resolved before first paint.
+
+      Runs synchronously in <head> so the stored TERMINAL/DAYLIGHT choice is on
+      <html> before any pixel is painted — applying it from React would show a
+      full dark render first and then snap to light. Falls back to the OS
+      preference on a first visit, and to TERMINAL if storage is unavailable.
+    -->
+    <script>
+      (function () {
+        try {
+          var saved = JSON.parse(localStorage.getItem("sharim-os:prefs") || "{}");
+          var theme =
+            saved.theme ||
+            (window.matchMedia("(prefers-color-scheme: light)").matches
+              ? "daylight"
+              : "terminal");
+          document.documentElement.dataset.theme = theme;
+          if (theme === "daylight") {
+            document
+              .querySelector('meta[name="theme-color"]')
+              .setAttribute("content", "#eef2f7");
+          }
+        } catch (e) {
+          document.documentElement.dataset.theme = "terminal";
+        }
+      })();
+    </script>
+
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta

@@ -9,7 +9,7 @@ export const skillGroups: SkillGroup[] = [
   {
     id: "frontend",
     name: "Frontend",
-    accent: "#22d3ee",
+    accent: "var(--color-cyan)",
     skills: [
       { name: "React.js", context: "Primary UI library across enterprise apps and dashboards" },
       { name: "React Router", context: "SPA routing (Pamatec, dashboards)" },
@@ -22,7 +22,7 @@ export const skillGroups: SkillGroup[] = [
   {
     id: "backend",
     name: "Backend",
-    accent: "#3b82f6",
+    accent: "var(--color-blue)",
     skills: [
       { name: "Node.js", context: "API services; cut response times by 20%" },
       { name: "Express.js", context: "REST API layer in MERN systems" },
@@ -38,7 +38,7 @@ export const skillGroups: SkillGroup[] = [
   {
     id: "ai-security",
     name: "AI & Security",
-    accent: "#8b5cf6",
+    accent: "var(--color-violet)",
     skills: [
       { name: "OpenAI API", context: "LLM integration in the AI Gateway" },
       { name: "Anthropic API", context: "Claude routing through governed DLP pipeline" },
@@ -55,7 +55,7 @@ export const skillGroups: SkillGroup[] = [
   {
     id: "database",
     name: "Databases",
-    accent: "#34d399",
+    accent: "var(--color-mint)",
     skills: [
       { name: "MongoDB", context: "Document store in MERN and ERP systems" },
       { name: "MySQL", context: "Query optimization and data modeling" },
@@ -67,7 +67,7 @@ export const skillGroups: SkillGroup[] = [
   {
     id: "cloud",
     name: "Cloud & DevOps",
-    accent: "#f59e0b",
+    accent: "var(--color-warn)",
     skills: [
       { name: "AWS EC2", context: "Compute hosting" },
       { name: "AWS S3", context: "Object storage" },
@@ -85,7 +85,7 @@ export const skillGroups: SkillGroup[] = [
   {
     id: "platforms",
     name: "Platforms",
-    accent: "#ec4899",
+    accent: "var(--color-pink)",
     skills: [
       { name: "Zoho Creator", context: "Enterprise workflow automation" },
       { name: "Zoho Catalyst", context: "Serverless functions" },
