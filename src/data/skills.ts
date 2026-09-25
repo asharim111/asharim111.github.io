@@ -24,7 +24,7 @@ export const skillGroups: SkillGroup[] = [
     name: "Backend",
     accent: "var(--color-blue)",
     skills: [
-      { name: "Node.js", context: "API services; cut response times by 20%" },
+      { name: "Node.js", context: "API services; cut response times ~50% (160ms → 80ms)" },
       { name: "Express.js", context: "REST API layer in MERN systems" },
       { name: "EJS", context: "Server-rendered views for the oil & gas corporate platform" },
       { name: "FastAPI", context: "Python services powering the AI Gateway" },

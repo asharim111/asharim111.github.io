@@ -1,6 +1,6 @@
 # asharim-portfolio
 
-Interactive engineering-environment portfolio for Sharim Ansari, Senior Full Stack Developer.
+Interactive engineering-environment portfolio for Sharim Ansari, Senior Full Stack Engineer.
 Built with React 18, TypeScript, Vite, Tailwind CSS v4, Motion (`motion/react`), and Lucide icons.
 
 ## Commands
@@ -34,7 +34,7 @@ Every animation path respects `prefers-reduced-motion`.
 
 ```
 public/
-  Sharim-Ansari-Resume.pdf   # served at /Sharim-Ansari-Resume.pdf (Download Resume buttons)
+  Sharim-Ansari-Senior-Full-Stack-Engineer.pdf   # served at /Sharim-Ansari-Senior-Full-Stack-Engineer.pdf (Download Resume buttons)
 src/
   data/         # ALL portfolio content — edit these to update the site
   lib/system.ts # SHARIM.OS store: console, sections, discovery, session tracking
@@ -46,7 +46,7 @@ src/
 ## Updating content
 
 Everything user-visible is data-driven — edit the files in `src/data/` and rebuild.
-To replace the resume, overwrite `public/Sharim-Ansari-Resume.pdf` (keep the filename,
+To replace the resume, overwrite `public/Sharim-Ansari-Senior-Full-Stack-Engineer.pdf` (keep the filename,
 or update `resumeFile` in `src/data/profile.ts`).
 
 Before deploying, replace the canonical URL placeholder in `index.html`

@@ -82,7 +82,7 @@ export const JOURNEYS: Journey[] = [
     id: "automation",
     label: "AUTOMATION",
     headline:
-      "Replacing manual handoffs with reliable automation — 4 procurement stages, 3+ internal workflows, marketplace and carrier integrations.",
+      "Replacing manual handoffs with reliable automation — 4 procurement stages, approval cycles cut from 4 days to 5 hours, 20+ carrier and marketplace integrations.",
     order: ["experience", "architecture", "projects", "skills", "ai-security", "about", "education", "metrics"],
     steps: [
       { label: "Experience", href: "#experience" },

@@ -2,28 +2,29 @@ export const profile = {
   name: "Sharim Ansari",
   logoShort: "SA",
   logoLong: "SHARIM // ANSARI",
-  title: "Senior Full Stack Developer",
+  title: "Senior Full Stack Engineer",
   specialties:
-    "MERN Stack · PHP · Python · AI Integration · Enterprise Automation · API Integrations",
+    "React.js · TypeScript · Node.js · Python / FastAPI · PHP · REST API Integration · Application Security",
   positioning:
     "Building scalable enterprise applications, intelligent AI systems, workflow automation platforms, and secure digital solutions.",
   headline: "Engineering the Future of Enterprise Software.",
   subheadline:
-    "Full Stack Developer specializing in AI integration, enterprise automation, secure APIs, and scalable digital platforms.",
+    "Full Stack Engineer specializing in AI integration, enterprise automation, secure APIs, and scalable digital platforms.",
   yearsExperience: "7+",
   location: "Kuwait",
   email: "asharim111@gmail.com",
-  phone: "+965 989-70432",
+  phone: "+965 9897 0432",
   linkedin: "https://linkedin.com/in/sharim-ansari",
   github: "https://github.com/asharim111",
-  resumeFile: `${import.meta.env.BASE_URL}Sharim-Ansari-Resume.pdf`,
+  resumeFile: `${import.meta.env.BASE_URL}Sharim-Ansari-Senior-Full-Stack-Engineer.pdf`,
   status: "Available for Opportunities",
   intro:
-    "Full Stack Developer with 7 years of experience building scalable web applications, enterprise workflow automation systems, procurement platforms, logistics solutions, and AI-powered applications.",
+    "Senior Full Stack Engineer with 7 years building enterprise web platforms in React, TypeScript, Node.js, Python/FastAPI and PHP across workflow automation, procurement, and logistics — currently designing and shipping an internal AI gateway that gives 100+ employees governed access to LLMs.",
   aboutExpertise: [
     "MERN Stack",
     "PHP",
     "React.js",
+    "TypeScript",
     "Node.js",
     "Python",
     "REST APIs",
@@ -36,8 +37,8 @@ export const profile = {
     "Enterprise Automation",
   ],
   languages: [
-    { name: "English", level: "Intermediate" },
-    { name: "Hindi", level: "Advanced" },
+    { name: "English", level: "Professional working proficiency" },
+    { name: "Hindi", level: "Fluent" },
     { name: "Arabic", level: "Basic" },
   ],
 };
@@ -55,23 +56,23 @@ export const briefing = {
       metric: "3,500+",
       label: "global carriers",
       detail:
-        "Built a shipment tracking platform delivering live updates across 3,500+ carriers, plus carrier and marketplace API integrations that improved synchronization efficiency by 25%.",
+        "Built dmstrack.com, tracking 500+ shipments a month across 3,500+ carriers, plus 20+ carrier and marketplace API integrations whose retry, rate-limit and idempotency handling cut sync run time by 25%.",
     },
     {
       metric: "19",
       label: "DLP detection categories",
       detail:
-        "Architected an enterprise AI gateway routing all employee ChatGPT/Claude usage through two-layer data loss prevention — Microsoft Presidio and an LLM classifier — behind Entra ID SSO and full audit logging.",
+        "Architected an internal AI gateway giving 100+ employees across 7 departments governed access to OpenAI, Anthropic and Groq, with 700+ prompts and uploads a day screened by two-layer DLP — Microsoft Presidio and an LLM classifier — behind Entra ID SSO.",
     },
     {
       metric: "4",
       label: "procurement stages automated",
       detail:
-        "Automated material requests, purchase orders, invoice handling and ticket closure, centralizing 3+ internal workflows across IT, business and procurement in a MERN ticket management system.",
+        "Automated material requests, purchase orders, invoice handling and ticket closure — cutting approval cycle time from 4 days to 5 hours — and consolidated 3 request workflows into a MERN ticket platform handling 250+ tickets a month.",
     },
   ],
   strengths: [
-    "MERN · FastAPI · PHP",
+    "MERN · TypeScript · FastAPI · PHP",
     "PostgreSQL · MongoDB · SQL Server",
     "AI integration & governance",
     "Enterprise automation",
@@ -86,7 +87,7 @@ export const heroMetrics = [
   { value: 19, suffix: "", label: "AI/DLP Detection Categories" },
   { value: 12, suffix: "+", label: "Interactive Analytics Charts" },
   {
-    value: 25,
+    value: 50,
     suffix: "%",
     label: "Peak Performance Improvement",
     prefix: "up to ",
@@ -98,8 +99,8 @@ export const systemMetrics = [
   { value: 3500, suffix: "+", label: "Global Carriers" },
   { value: 19, suffix: "", label: "DLP Detection Categories" },
   { value: 12, suffix: "+", label: "Analytics Charts" },
-  { value: 25, suffix: "%", label: "Synchronization Efficiency Improvement" },
-  { value: 20, suffix: "%", label: "API / Page Performance Improvements" },
+  { value: 25, suffix: "%", label: "Sync Run-Time Reduction" },
+  { value: 50, suffix: "%", label: "API Response-Time Reduction" },
 ];
 
 export const philosophy = [
@@ -131,12 +132,6 @@ export const philosophy = [
 
 export const careerTimeline = [
   {
-    year: "2019",
-    phase: "BOOTSTRAP",
-    role: "PHP Developer Intern",
-    org: "Evolution Co",
-  },
-  {
     year: "2019–2022",
     phase: "SYSTEM DEVELOPMENT",
     role: "Full Stack Developer",
@@ -145,13 +140,13 @@ export const careerTimeline = [
   {
     year: "2022–2025",
     phase: "SCALE",
-    role: "Web Developer",
+    role: "Web Developer (Full Stack Developer)",
     org: "Phoenix Biz Solutions",
   },
   {
     year: "2025–Present",
     phase: "ENTERPRISE AI",
-    role: "Full Stack Developer",
+    role: "Senior Full Stack Developer",
     org: "Al Rashed Holdings",
   },
 ];

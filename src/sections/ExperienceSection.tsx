@@ -13,7 +13,7 @@ const gatewaySteps = [
   { label: "AI Gateway", sub: "FastAPI · React · PostgreSQL · Redis" },
   { label: "Two-Layer DLP", sub: "Presidio + LLM Classifier" },
   { label: "Policy Engine + Audit Log" },
-  { label: "ChatGPT / Claude" },
+  { label: "OpenAI / Anthropic / Groq" },
 ];
 
 const logisticsSteps = [

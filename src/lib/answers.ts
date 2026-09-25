@@ -203,7 +203,7 @@ function topicEntries(): Entry[] {
       section: "experience",
       keywords: ["years", "experience", "senior", "long", "career", "timeline", "history", "seniority"],
       build: () => ({
-        title: `${profile.yearsExperience} years, four companies`,
+        title: `${profile.yearsExperience} years, three companies`,
         body: `${profile.intro}`,
         facts: careerTimeline.map((t) => [t.year, `${t.role} — ${t.org}`] as [string, string]),
       }),
@@ -218,7 +218,7 @@ function topicEntries(): Entry[] {
       ],
       build: () => ({
         title: `Based in ${profile.location}`,
-        body: `Currently ${currentRole.role} at ${currentRole.org} in ${profile.location}. Earlier roles were in Thane and Mumbai, India.`,
+        body: `Currently ${currentRole.role} at ${currentRole.org} in ${profile.location}. Earlier roles were in Thane, India.`,
         facts: [
           ["Now", `${currentRole.org} · ${profile.location}`],
           ["Status", profile.status],

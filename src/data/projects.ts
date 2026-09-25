@@ -49,7 +49,7 @@ export const projects: Project[] = [
     id: "ai-gateway",
     index: "01",
     name: "AI Gateway",
-    subtitle: "Enterprise DLP Proxy for ChatGPT & Claude",
+    subtitle: "Enterprise DLP Proxy for OpenAI, Anthropic & Groq",
     dates: "Jun 2026 – Present",
     aliases: ["gateway", "dlp", "presidio", "chatgpt", "claude", "ai proxy"],
     categories: ["AI / ML", "Security", "Enterprise", "Full Stack"],
@@ -66,13 +66,13 @@ export const projects: Project[] = [
       "Microsoft Entra ID",
     ],
     description:
-      "Scans employee prompts and file attachments through a two-layer DLP engine before routing requests to AI providers.",
+      "Scans 700+ employee prompts and file attachments a day through a two-layer DLP engine before routing requests to OpenAI, Anthropic or Groq — governed AI access for 100+ employees across 7 departments.",
     keyAchievement: "19 Detection Categories",
     visual: "gateway",
     hero: true,
     detail: {
       overview:
-        "A secure enterprise AI gateway that routes all employee ChatGPT/Claude usage through a governed pipeline with data loss prevention, identity enforcement, and full auditability.",
+        "A secure enterprise AI gateway giving 100+ employees across 7 departments governed access to OpenAI, Anthropic and Groq models — replacing unmonitored public AI usage with a pipeline of data loss prevention, identity enforcement, and full auditability.",
       problem:
         "Employees using public AI tools can unintentionally leak sensitive corporate data, with no visibility or policy control for the organization.",
       constraints: [
@@ -83,7 +83,7 @@ export const projects: Project[] = [
         "No single-provider lock-in: OpenAI, Anthropic and Groq all had to be routable.",
       ],
       solution:
-        "Every prompt and file attachment passes through a two-layer DLP engine — Microsoft Presidio plus an LLM classifier — across 19 detection categories before requests are routed to OpenAI, Anthropic, or Groq. Entra ID SSO, department-level policy controls, audit logging, and real-time admin alerts on every flagged prompt.",
+        "700+ prompts and file uploads a day pass through a two-layer DLP engine — Microsoft Presidio plus an LLM classifier — across 19 detection categories before requests are routed to OpenAI, Anthropic, or Groq. Entra ID SSO, department-level policy enforcement, RBAC, audit logging, and real-time admin alerts on flagged content.",
       architecture: [
         "Employee",
         "Entra ID Authentication",
@@ -116,10 +116,11 @@ export const projects: Project[] = [
         },
       ],
       results: [
-        "19 DLP detection categories across prompts and file attachments",
+        "100+ employees across 7 departments on one auditable, policy-controlled AI channel",
+        "700+ prompts and file uploads screened per day across 19 DLP detection categories",
         "Two-layer scanning: Microsoft Presidio + LLM classifier",
-        "Entra ID SSO with department-level policy controls",
-        "Audit logging with real-time admin alerting on flagged prompts",
+        "Entra ID SSO with department-level policy enforcement and RBAC",
+        "Audit logging with real-time admin alerting on flagged content",
       ],
       role: "Architect & Full Stack Developer",
       timeline: "Jun 2026 – Present",
@@ -144,7 +145,7 @@ export const projects: Project[] = [
     ],
     description:
       "Server-rendered corporate platform for an oil & gas group of six companies, backed by a relational content model and a schema-driven admin CMS that generates CRUD screens for every content type.",
-    keyAchievement: "10 Admin-Managed Content Types",
+    keyAchievement: "13 Admin-Managed Content Types",
     visual: "cms",
     detail: {
       overview:
@@ -158,7 +159,7 @@ export const projects: Project[] = [
         "Schema changes have to land on a database holding live content, reviewably and reversibly.",
       ],
       solution:
-        "Rebuilt as an Express 5 + EJS application on PostgreSQL around a relational content model: a product is entered once, tagged to its company and to the streams it serves, and surfaces automatically on the company page and on every stream page — the two lists can never drift. A schema-driven admin panel generates the list screen, form, validation and delete for all 10 content types from a single resource definition, so a new content type needs no controller and no templates. Numbered SQL migrations, PostgreSQL-backed session auth, image uploads, a read-only JSON API and a health endpoint, containerized and deployed to Fly.io through GitHub Actions.",
+        "Rebuilt as an Express 5 + EJS application on PostgreSQL around a relational content model: a product is entered once, tagged to its company and to the streams it serves, and surfaces automatically on the company page and on every stream page — the two lists can never drift. A schema-driven admin panel generates the list screen, form, validation and delete for all 13 content types from a single resource definition, so a new content type needs no controller and no templates. A normalized ~17-table schema with numbered SQL migrations, bcrypt session auth on a PostgreSQL-backed session store, parameterized SQL throughout, image uploads, a read-only JSON API and a health endpoint — built as a multi-stage Docker image and deployed to Fly.io through GitHub Actions.",
       architecture: [
         "Visitor / Admin",
         "Express 5 Router",
@@ -180,8 +181,8 @@ export const projects: Project[] = [
           tradeoff: "Every new content shape is a migration, not a new file.",
         },
         {
-          choice: "One schema-driven admin panel over ten hand-written CRUD screens",
-          why: "Ten content types with a list, a form, validation and delete each is forty surfaces to keep consistent. A single resource definition generates all of them, so a new content type needs no controller and no templates.",
+          choice: "One schema-driven admin panel over thirteen hand-written CRUD screens",
+          why: "Thirteen content types with a list, a form, validation and delete each is fifty-two surfaces to keep consistent. A single resource definition generates all of them, so a new content type needs no controller and no templates.",
           tradeoff: "Anything that doesn't fit the generated shape has to escape the abstraction deliberately.",
         },
         {
@@ -193,9 +194,10 @@ export const projects: Project[] = [
       results: [
         "6 companies, 3 business streams and 5 shared categories driving 21 public routes",
         "44 products entered once — each surfaces on its company page and every stream tagged to it",
-        "Schema-driven admin panel: 10 content types with CRUD, validation and image uploads from one definition file",
-        "Numbered SQL migrations applied transactionally, so schema changes ship without touching live content",
-        "Containerized with a liveness endpoint and auto-deployed to Fly.io on every push",
+        "Schema-driven admin panel: 13 content types with CRUD, validation and image uploads from one definition file",
+        "Normalized ~17-table schema with numbered SQL migrations applied transactionally, so schema changes ship without touching live content",
+        "Secured with bcrypt session auth, a Postgres-backed session store and parameterized SQL throughout",
+        "Multi-stage Docker build with a liveness endpoint, auto-deployed to Fly.io through GitHub Actions on every push",
       ],
       role: "Architect & Full Stack Developer",
       timeline: "Apr 2026 – Present",
@@ -209,7 +211,7 @@ export const projects: Project[] = [
     dates: "Oct 2025 – Feb 2026",
     aliases: ["dashboard", "bi", "kpi", "erp", "sql server", "charts"],
     categories: ["Analytics", "Full Stack", "Enterprise"],
-    stack: ["React.js", "Node.js", "Express.js", "Microsoft SQL Server"],
+    stack: ["React.js", "TypeScript", "Node.js", "Express.js", "Microsoft SQL Server"],
     description:
       "Full-stack sales analytics dashboard integrating with an ERP database to deliver real-time KPIs, salesman performance tracking, and profit margin analysis.",
     keyAchievement: "12+ Interactive Charts",
@@ -225,7 +227,7 @@ export const projects: Project[] = [
         "Salesman performance and profit margin are sensitive; access follows role.",
       ],
       solution:
-        "A React.js front end backed by Node.js/Express.js services querying Microsoft SQL Server, delivering real-time KPIs, salesman performance tracking, and profit margin analysis through 12+ interactive charts.",
+        "A React.js + TypeScript front end backed by Node.js/Express.js services querying Microsoft SQL Server, delivering real-time KPIs, salesman performance tracking, and profit margin analysis through 12+ interactive charts.",
       architecture: [
         "React Dashboard",
         "Node.js / Express API",
