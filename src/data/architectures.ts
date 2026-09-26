@@ -62,12 +62,13 @@ export const architectures: ArchitectureDef[] = [
     name: "Server-Rendered CMS",
     nodes: [
       { label: "Visitor / Admin", kind: "user" },
-      { label: "Express Router", sub: "Public site · Admin · JSON API", kind: "service" },
+      { label: "IP Allowlist", sub: "CIDR ranges · IPv4 / IPv6", kind: "security" },
+      { label: "Express Router", sub: "Group site · 6 company sites · Admin · JSON API", kind: "service" },
       { label: "Session Authentication", sub: "PostgreSQL-backed sessions", kind: "security" },
-      { label: "Content Service Layer", sub: "Every read query in one module", kind: "service" },
-      { label: "PostgreSQL", sub: "Relational content model · migrations", kind: "data" },
-      { label: "EJS Server-Side Rendering", kind: "app" },
-      { label: "Docker / Fly.io", sub: "GitHub Actions CI/CD", kind: "infra" },
+      { label: "Content Service Layer", sub: "Every read query in one module · cached menus", kind: "service" },
+      { label: "PostgreSQL", sub: "Relational content model · JSONB page blocks · migrations", kind: "data" },
+      { label: "EJS Server-Side Rendering", sub: "17 typed section blocks", kind: "app" },
+      { label: "Docker / Fly.io", sub: "GitHub Actions CI/CD · guarded DB sync", kind: "infra" },
     ],
   },
   {

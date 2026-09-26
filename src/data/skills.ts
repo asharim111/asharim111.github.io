@@ -26,7 +26,7 @@ export const skillGroups: SkillGroup[] = [
     skills: [
       { name: "Node.js", context: "API services; cut response times ~50% (160ms → 80ms)" },
       { name: "Express.js", context: "REST API layer in MERN systems" },
-      { name: "EJS", context: "Server-rendered views for the oil & gas corporate platform" },
+      { name: "EJS", context: "Server-rendered group + 6 company sites for the oil & gas platform" },
       { name: "FastAPI", context: "Python services powering the AI Gateway" },
       { name: "PHP", context: "7 years across enterprise platforms" },
       { name: "Laravel", context: "PHP application framework" },
@@ -59,7 +59,7 @@ export const skillGroups: SkillGroup[] = [
     skills: [
       { name: "MongoDB", context: "Document store in MERN and ERP systems" },
       { name: "MySQL", context: "Query optimization and data modeling" },
-      { name: "PostgreSQL", context: "AI Gateway and oil & gas corporate platform persistence" },
+      { name: "PostgreSQL", context: "AI Gateway and oil & gas platform: JSONB page blocks, 20 transactional migrations" },
       { name: "SQL Server", context: "ERP-integrated analytics platform" },
       { name: "Redis", context: "Caching and fast state for the AI Gateway" },
     ],
@@ -74,7 +74,7 @@ export const skillGroups: SkillGroup[] = [
       { name: "AWS SQS", context: "Message queues" },
       { name: "AWS SES", context: "Transactional email" },
       { name: "Docker", context: "Containerized deployments" },
-      { name: "Fly.io", context: "Container hosting for the oil & gas corporate platform" },
+      { name: "Fly.io", context: "Container hosting and guarded Postgres sync for the oil & gas platform" },
       { name: "GitHub Actions", context: "CI/CD pipelines for containerized deploys" },
       { name: "Linux Server", context: "Server administration" },
       { name: "Git / Bitbucket", context: "Version control and collaboration" },
